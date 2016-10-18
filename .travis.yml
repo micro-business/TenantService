@@ -1,0 +1,35 @@
+sudo: required
+
+before_install:
+ - echo "deb http://debian.datastax.com/community stable main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+ - curl -L http://debian.datastax.com/debian/repo_key | sudo apt-key add -
+ - sudo apt-get update
+ - sudo apt-get -y install dsc20=2.0.11-1 cassandra=2.0.11
+ - sudo service cassandra stop
+ - sudo rm -rf /var/lib/cassandra/data/system/*
+ - sudo service cassandra start
+ - sleep 60
+
+language: go
+go:
+ - 1.6
+
+services:
+ - docker
+ 
+script:
+  - go test -v -tags=integration ./...
+
+after_success:
+  - go get github.com/mattn/goveralls
+  - go get github.com/modocache/gover
+  - ./coverage.bash
+  - goveralls -coverprofile gover.coverprofile -service drone.io -repotoken $COVERALLS_TOKEN
+  - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o TenantService main.go
+  - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+  - export REPO_NAME_EXTENSION=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo ""; else echo -$TRAVIS_BRANCH ; fi`
+  - export REPO=microbusinesses/tenant-service$REPO_NAME_EXTENSION
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - docker build -f Dockerfile -t $REPO .
+  - docker tag $REPO $REPO:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $REPO
