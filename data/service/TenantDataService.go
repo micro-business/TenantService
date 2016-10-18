@@ -29,9 +29,9 @@ func (tenantDataService TenantDataService) Create(tenant contract.Tenant) (syste
 // tenant: Mandatory. The reference to the updated tenant information.
 // Returns error if something goes wrong.
 func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant contract.Tenant) error {
-	diagnostics.IsNotNil(tenantDataService.UUIDGeneratorService, "tenantDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmptyOrWhitespace(tenant.SecretKey, "tenant.SecretKey", "SecretKey must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
 	return nil
 }
@@ -40,8 +40,8 @@ func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant c
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // Returns either the tenant information or error if something goes wrong.
 func (tenantDataService TenantDataService) Read(tenantID system.UUID) (contract.Tenant, error) {
-	diagnostics.IsNotNil(tenantDataService.UUIDGeneratorService, "tenantDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
 	return contract.Tenant{}, nil
 }
@@ -50,8 +50,8 @@ func (tenantDataService TenantDataService) Read(tenantID system.UUID) (contract.
 // tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 // Returns error if something goes wrong.
 func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
-	diagnostics.IsNotNil(tenantDataService.UUIDGeneratorService, "tenantDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
 	return nil
 }
