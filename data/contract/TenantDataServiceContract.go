@@ -3,6 +3,7 @@ package contract
 
 import "github.com/microbusinesses/Micro-Businesses-Core/system"
 
+// Tenant defines how a tenant should look like
 type Tenant struct {
 	SecretKey string
 }
@@ -25,7 +26,7 @@ type TenantDataService interface {
 	// Returns either the tenant information or error if something goes wrong.
 	Read(tenantID system.UUID) (Tenant, error)
 
-	// Deletes deletes an existing tenant information.
+	// Delete deletes an existing tenant information.
 	// tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 	// Returns error if something goes wrong.
 	Delete(tenantID system.UUID) error
