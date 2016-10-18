@@ -24,7 +24,7 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 
 		tenantDataService = &service.TenantDataService{ClusterConfig: &gocql.ClusterConfig{}}
 
-		tenantID, _ := system.RandomUUID()
+		tenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
