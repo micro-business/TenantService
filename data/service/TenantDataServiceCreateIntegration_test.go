@@ -26,11 +26,16 @@ var _ = Describe("Create method behaviour", func() {
 		keyspace                 string
 	)
 
-	BeforeEach(func() {
+	BeforeSuite(func() {
 		keyspace = createRandomKeyspace()
-
 		createTenantKeyspaceAndAllRequiredTables(keyspace)
+	})
 
+	AfterSuite(func() {
+		dropKeyspace(keyspace)
+	})
+
+	BeforeEach(func() {
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
 
@@ -47,7 +52,6 @@ var _ = Describe("Create method behaviour", func() {
 
 	AfterEach(func() {
 		mockCtrl.Finish()
-		dropKeyspace(keyspace)
 	})
 
 	Context("when UUID generator service succeeds to create the new UUID", func() {
