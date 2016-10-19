@@ -21,7 +21,23 @@ func (tenantDataService TenantDataService) Create(tenant contract.Tenant) (syste
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmptyOrWhitespace(tenant.SecretKey, "tenant.SecretKey", "SecretKey must be provided.")
 
-	return system.EmptyUUID, nil
+	tenantID, err := tenantDataService.UUIDGeneratorService.GenerateRandomUUID()
+
+	if err != nil {
+		return system.EmptyUUID, err
+	}
+
+	session, err := tenantDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return system.EmptyUUID, err
+	}
+
+	defer session.Close()
+
+	err = addNewTenant(tenantID, tenant, session)
+
+	return tenantID, err
 }
 
 // Update updates an existing tenant.
@@ -33,7 +49,15 @@ func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant c
 	diagnostics.IsNotNilOrEmptyOrWhitespace(tenant.SecretKey, "tenant.SecretKey", "SecretKey must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
-	return nil
+	session, err := tenantDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return err
+	}
+
+	defer session.Close()
+
+	return addNewTenant(tenantID, tenant, session)
 }
 
 // Read retrieves an existing tenant.
@@ -54,4 +78,29 @@ func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
 	return nil
+}
+
+// mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
+func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
+	mappedUUID, _ := gocql.UUIDFromBytes(uuid.Bytes())
+
+	return mappedUUID
+}
+
+// addNewTenant adds new tenant to tenant table
+func addNewTenant(
+	tenantID system.UUID,
+	tenant contract.Tenant,
+	session *gocql.Session) error {
+
+	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
+
+	return session.Query(
+		"INSERT INTO tenant"+
+			" (tenant_id, secret_key)"+
+			" VALUES(?, ?)",
+		mappedTenantID,
+		tenant.SecretKey).
+		Exec()
+
 }
