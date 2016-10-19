@@ -26,7 +26,6 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
-
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: &gocql.ClusterConfig{}}
 
 		randomValue, _ := system.RandomUUID()
