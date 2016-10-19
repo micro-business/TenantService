@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/gocql/gocql"
 	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
@@ -67,7 +69,28 @@ func (tenantDataService TenantDataService) Read(tenantID system.UUID) (contract.
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
-	return contract.Tenant{}, nil
+	session, err := tenantDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return contract.Tenant{}, err
+	}
+
+	defer session.Close()
+
+	iter := session.Query(
+		"SELECT secret_key"+
+			" FROM tenant"+
+			" WHERE"+
+			" tenant_id = ?",
+		tenantID.String()).Iter()
+
+	tenant := contract.Tenant{}
+
+	if !iter.Scan(&tenant.SecretKey) {
+		return contract.Tenant{}, fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
+	}
+
+	return tenant, nil
 }
 
 // Delete deletes an existing tenant information.
@@ -85,7 +108,14 @@ func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
 
 	defer session.Close()
 
-	return removeExistingTenant(tenantID, session)
+	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
+
+	return session.Query(
+		"DELETE FROM tenant"+
+			" WHERE"+
+			" tenant_id = ?",
+		mappedTenantID).
+		Exec()
 }
 
 // mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
@@ -97,7 +127,6 @@ func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
 
 // addNewTenant adds new tenant to tenant table
 func addNewTenant(tenantID system.UUID, tenant contract.Tenant, session *gocql.Session) error {
-
 	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
 
 	return session.Query(
@@ -106,19 +135,5 @@ func addNewTenant(tenantID system.UUID, tenant contract.Tenant, session *gocql.S
 			" VALUES(?, ?)",
 		mappedTenantID,
 		tenant.SecretKey).
-		Exec()
-
-}
-
-// removeExistingTenant adds new tenant to tenant table
-func removeExistingTenant(tenantID system.UUID, session *gocql.Session) error {
-
-	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
-
-	return session.Query(
-		"DELETE FROM tenant"+
-			" WHERE"+
-			" tenant_id = ?",
-		mappedTenantID).
 		Exec()
 }

@@ -31,7 +31,7 @@ var _ = Describe("Delete method behaviour", func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
 
-		tenantDataService = &service.TenantDataService{ClusterConfig: clusterConfig}
+		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
 		tenantID, _ = system.RandomUUID()
 
