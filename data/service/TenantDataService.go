@@ -77,7 +77,15 @@ func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
-	return nil
+	session, err := tenantDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return err
+	}
+
+	defer session.Close()
+
+	return removeExistingTenant(tenantID, session)
 }
 
 // mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
@@ -88,10 +96,7 @@ func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
 }
 
 // addNewTenant adds new tenant to tenant table
-func addNewTenant(
-	tenantID system.UUID,
-	tenant contract.Tenant,
-	session *gocql.Session) error {
+func addNewTenant(tenantID system.UUID, tenant contract.Tenant, session *gocql.Session) error {
 
 	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
 
@@ -103,4 +108,17 @@ func addNewTenant(
 		tenant.SecretKey).
 		Exec()
 
+}
+
+// removeExistingTenant adds new tenant to tenant table
+func removeExistingTenant(tenantID system.UUID, session *gocql.Session) error {
+
+	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
+
+	return session.Query(
+		"DELETE FROM tenant"+
+			" WHERE"+
+			" tenant_id = ?",
+		mappedTenantID).
+		Exec()
 }

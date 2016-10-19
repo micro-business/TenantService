@@ -76,7 +76,7 @@ var _ = Describe("Create method behaviour", func() {
 	})
 
 	Context("when creating new tenant", func() {
-		It("should insert the records into tenant table", func() {
+		It("should insert the record into tenant table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
