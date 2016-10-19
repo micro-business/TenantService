@@ -23,17 +23,7 @@ var _ = Describe("Create method behaviour", func() {
 		tenantID                 system.UUID
 		validTenant              contract.Tenant
 		clusterConfig            *gocql.ClusterConfig
-		keyspace                 string
 	)
-
-	BeforeSuite(func() {
-		keyspace = createRandomKeyspace()
-		createTenantKeyspaceAndAllRequiredTables(keyspace)
-	})
-
-	AfterSuite(func() {
-		dropKeyspace(keyspace)
-	})
 
 	BeforeEach(func() {
 		clusterConfig = getClusterConfig()
