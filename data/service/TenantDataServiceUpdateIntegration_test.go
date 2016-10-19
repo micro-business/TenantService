@@ -3,7 +3,6 @@
 package service_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/gocql/gocql"
@@ -15,7 +14,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Create method behaviour", func() {
+var _ = Describe("Update method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
@@ -44,39 +43,8 @@ var _ = Describe("Create method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	Context("when UUID generator service succeeds to create the new UUID", func() {
-		It("should return the new UUID as tenant uniuqe identifier and no error", func() {
-			expectedTenantID, _ := system.RandomUUID()
-			mockUUIDGeneratorService.
-				EXPECT().
-				GenerateRandomUUID().
-				Return(expectedTenantID, nil)
-
-			newTenantID, err := tenantDataService.Create(validTenant)
-
-			Expect(expectedTenantID).To(Equal(newTenantID))
-			Expect(err).To(BeNil())
-		})
-	})
-
-	Context("when UUID generator service fails to create the new UUID", func() {
-		It("should return tenant unique identifier as empty UUID and the returned error by tenant data service", func() {
-			expectedErrorID, _ := system.RandomUUID()
-			expectedError := errors.New(expectedErrorID.String())
-			mockUUIDGeneratorService.
-				EXPECT().
-				GenerateRandomUUID().
-				Return(system.EmptyUUID, expectedError)
-
-			newTenantID, err := tenantDataService.Create(validTenant)
-
-			Expect(newTenantID).To(Equal(system.EmptyUUID))
-			Expect(err).To(Equal(expectedError))
-		})
-	})
-
-	Context("when creating new tenant", func() {
-		It("should insert the record into tenant table", func() {
+	Context("when updating an existing tenant", func() {
+		It("should update the record in tenant table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
@@ -84,7 +52,13 @@ var _ = Describe("Create method behaviour", func() {
 
 			returnedTenantID, err := tenantDataService.Create(validTenant)
 
-			Expect(tenantID).To(Equal(returnedTenantID))
+			Expect(err).To(BeNil())
+
+			randomValue, _ := system.RandomUUID()
+			updatedTenant := contract.Tenant{SecretKey: randomValue.String()}
+
+			err = tenantDataService.Update(returnedTenantID, updatedTenant)
+
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -108,12 +82,12 @@ var _ = Describe("Create method behaviour", func() {
 			var secretKey string
 
 			Expect(iter.Scan(&secretKey)).To(BeTrue())
-			Expect(validTenant.SecretKey).To(Equal(secretKey))
+			Expect(updatedTenant.SecretKey).To(Equal(secretKey))
 		})
 	})
 })
 
-func TestCreateBehaviour(t *testing.T) {
+func TestUpdateBehaviour(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Create method behaviour")
+	RunSpecs(t, "Update method behaviour")
 }
