@@ -18,8 +18,6 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		mockCtrl                          *gomock.Controller
 		tenantService                     *service.TenantService
 		mockTenantDataService             *MockTenantDataService
-		tenantID                          system.UUID
-		applicationID                     system.UUID
 		validTenant                       domain.Tenant
 		tenantWithEmptySecretKey          domain.Tenant
 		tenantWithWhitespaceOnlySecretKey domain.Tenant
@@ -31,8 +29,6 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
-		tenantID, _ = system.RandomUUID()
-		applicationID, _ = system.RandomUUID()
 		validTenant = domain.Tenant{SecretKey: "Secret Key"}
 		tenantWithEmptySecretKey = domain.Tenant{SecretKey: ""}
 		tenantWithWhitespaceOnlySecretKey = domain.Tenant{SecretKey: "   "}
@@ -66,8 +62,6 @@ var _ = Describe("Create method behaviour", func() {
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
 		mockTenantDataService *MockTenantDataService
-		tenantID              system.UUID
-		applicationID         system.UUID
 		validTenant           domain.Tenant
 	)
 
@@ -77,8 +71,6 @@ var _ = Describe("Create method behaviour", func() {
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
-		tenantID, _ = system.RandomUUID()
-		applicationID, _ = system.RandomUUID()
 		validTenant = domain.Tenant{SecretKey: "Secret Key"}
 	})
 
