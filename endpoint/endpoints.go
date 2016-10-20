@@ -86,8 +86,9 @@ var rootMutationType = graphql.NewObject(
 					},
 				},
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
-					inputTenantArgument, _ := resolveParams.Args["tenant"].(tenant)
-					tenant := mapTenantToDomainTenant(inputTenantArgument)
+					inputTenantArgument, _ := resolveParams.Args["tenant"].(map[string]interface{})
+
+					tenant := resolveTenantFromInputTenantArgument(inputTenantArgument)
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
@@ -113,8 +114,8 @@ var rootMutationType = graphql.NewObject(
 					},
 				},
 				Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
+					inputTenantArgument, _ := resolveParams.Args["tenant"].(map[string]interface{})
 					id, _ := resolveParams.Args["id"].(string)
-					inputTenantArgument, _ := resolveParams.Args["tenant"].(tenant)
 
 					var tenantID system.UUID
 					var err error
@@ -123,7 +124,7 @@ var rootMutationType = graphql.NewObject(
 						return nil, err
 					}
 
-					tenant := mapTenantToDomainTenant(inputTenantArgument)
+					tenant := resolveTenantFromInputTenantArgument(inputTenantArgument)
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
@@ -204,6 +205,14 @@ func executeQuery(query string, tenantService contract.TenantService) *graphql.R
 		})
 }
 
-func mapTenantToDomainTenant(tenant tenant) domain.Tenant {
-	return domain.Tenant{SecretKey: tenant.SecretKey}
+func resolveTenantFromInputTenantArgument(inputTenantArgument map[string]interface{}) domain.Tenant {
+	tenant := domain.Tenant{}
+
+	secretKeyArg, secretKeyArgProvided := inputTenantArgument[secretKey].(string)
+
+	if secretKeyArgProvided {
+		tenant.SecretKey = secretKeyArg
+	}
+
+	return tenant
 }
