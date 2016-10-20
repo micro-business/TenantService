@@ -8,7 +8,6 @@ import (
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -36,12 +35,6 @@ var _ = Describe("Read method input parameters and dependency test", func() {
 			Ω(func() { tenantDataService.Read(tenantID) }).Should(Panic())
 		})
 	})
-
-	DescribeTable("Input Parameters",
-		func(tenantID system.UUID) {
-			Ω(func() { tenantDataService.Read(tenantID) }).Should(Panic())
-		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID))
 })
 
 func TestRead(t *testing.T) {

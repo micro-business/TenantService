@@ -8,7 +8,6 @@ import (
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -37,12 +36,6 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 			Ω(func() { tenantDataService.Delete(tenantID) }).Should(Panic())
 		})
 	})
-
-	DescribeTable("Input Parameters",
-		func(tenantID system.UUID) {
-			Ω(func() { tenantDataService.Delete(tenantID) }).Should(Panic())
-		},
-		Entry("should panic when empty tenant unique identifier provided", system.EmptyUUID))
 })
 
 func TestDelete(t *testing.T) {

@@ -21,7 +21,6 @@ type TenantDataService struct {
 func (tenantDataService TenantDataService) Create(tenant contract.Tenant) (system.UUID, error) {
 	diagnostics.IsNotNil(tenantDataService.UUIDGeneratorService, "tenantDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmptyOrWhitespace(tenant.SecretKey, "tenant.SecretKey", "SecretKey must be provided.")
 
 	tenantID, err := tenantDataService.UUIDGeneratorService.GenerateRandomUUID()
 
@@ -48,8 +47,6 @@ func (tenantDataService TenantDataService) Create(tenant contract.Tenant) (syste
 // Returns error if something goes wrong.
 func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant contract.Tenant) error {
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmptyOrWhitespace(tenant.SecretKey, "tenant.SecretKey", "SecretKey must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
 	session, err := tenantDataService.ClusterConfig.CreateSession()
 
@@ -67,7 +64,6 @@ func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant c
 // Returns either the tenant information or error if something goes wrong.
 func (tenantDataService TenantDataService) Read(tenantID system.UUID) (contract.Tenant, error) {
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
 	session, err := tenantDataService.ClusterConfig.CreateSession()
 
@@ -98,7 +94,6 @@ func (tenantDataService TenantDataService) Read(tenantID system.UUID) (contract.
 // Returns error if something goes wrong.
 func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
-	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
 	session, err := tenantDataService.ClusterConfig.CreateSession()
 
