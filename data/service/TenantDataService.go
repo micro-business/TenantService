@@ -56,6 +56,10 @@ func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant c
 
 	defer session.Close()
 
+	if _, err := readTenant(tenantID, session); err != nil {
+		return err
+	}
+
 	return addNewTenant(tenantID, tenant, session)
 }
 
@@ -73,20 +77,8 @@ func (tenantDataService TenantDataService) Read(tenantID system.UUID) (contract.
 
 	defer session.Close()
 
-	iter := session.Query(
-		"SELECT secret_key"+
-			" FROM tenant"+
-			" WHERE"+
-			" tenant_id = ?",
-		tenantID.String()).Iter()
+	return readTenant(tenantID, session)
 
-	tenant := contract.Tenant{}
-
-	if !iter.Scan(&tenant.SecretKey) {
-		return contract.Tenant{}, fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
-	}
-
-	return tenant, nil
 }
 
 // Delete deletes an existing tenant information.
@@ -102,6 +94,10 @@ func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
 	}
 
 	defer session.Close()
+
+	if _, err := readTenant(tenantID, session); err != nil {
+		return err
+	}
 
 	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
 
@@ -131,4 +127,23 @@ func addNewTenant(tenantID system.UUID, tenant contract.Tenant, session *gocql.S
 		mappedTenantID,
 		tenant.SecretKey).
 		Exec()
+}
+
+// readTenant takes the provided tenantID and tries to read the tenant information from database
+func readTenant(tenantID system.UUID, session *gocql.Session) (contract.Tenant, error) {
+	iter := session.Query(
+		"SELECT secret_key"+
+			" FROM tenant"+
+			" WHERE"+
+			" tenant_id = ?",
+		tenantID.String()).Iter()
+
+	tenant := contract.Tenant{}
+
+	if !iter.Scan(&tenant.SecretKey) {
+		return contract.Tenant{}, fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
+	}
+
+	return tenant, nil
+
 }

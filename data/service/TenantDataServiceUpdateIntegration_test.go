@@ -3,6 +3,7 @@
 package service_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/gocql/gocql"
@@ -44,6 +45,12 @@ var _ = Describe("Update method behaviour", func() {
 	})
 
 	Context("when updating an existing tenant", func() {
+		It("should return error if tenant does not exist", func() {
+			_, err := tenantDataService.Update(tenantID, validTenant)
+
+			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())))
+		})
+
 		It("should update the record in tenant table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
