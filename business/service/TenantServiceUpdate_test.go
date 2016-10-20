@@ -94,8 +94,8 @@ var _ = Describe("Update method behaviour", func() {
 		tenantService.Update(tenantID, validTenant)
 	})
 
-	Context("when tenant data service succeeds to create the new tenant", func() {
-		It("should return the returned tenant unique identifier by tenant data service and no error", func() {
+	Context("when tenant data service succeeds to update the existing tenant", func() {
+		It("should return no error", func() {
 			mappedTenant := contract.Tenant{SecretKey: validTenant.SecretKey}
 
 			mockTenantDataService.
@@ -109,8 +109,8 @@ var _ = Describe("Update method behaviour", func() {
 		})
 	})
 
-	Context("when tenant data service fails to create the new tenant", func() {
-		It("should return tenant unique identifier as empty UUID and the returned error by tenant data service", func() {
+	Context("when tenant data service fails to update the existing tenant", func() {
+		It("should return error returned by tenant data service", func() {
 			mappedTenant := contract.Tenant{SecretKey: validTenant.SecretKey}
 
 			expectedErrorID, _ := system.RandomUUID()
