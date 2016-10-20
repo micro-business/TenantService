@@ -46,7 +46,7 @@ var _ = Describe("Delete method behaviour", func() {
 
 	Context("when deleting existing tenant", func() {
 		It("should return error if tenant does not exist", func() {
-			_, err := tenantDataService.Delete(tenantID)
+			err := tenantDataService.Delete(tenantID)
 
 			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())))
 		})
