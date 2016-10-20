@@ -1,6 +1,20 @@
 package main
 
-import "flag"
+import (
+	"flag"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+
+	"github.com/gocql/gocql"
+	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
+	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	businessService "github.com/microbusinesses/TenantService/business/service"
+	"github.com/microbusinesses/TenantService/config"
+	dataService "github.com/microbusinesses/TenantService/data/service"
+	"github.com/microbusinesses/TenantService/endpoint"
+)
 
 var consulAddress string
 var consulScheme string
@@ -17,4 +31,71 @@ func main() {
 	flag.StringVar(&cassandraKeyspace, "cassandra-keyspace", "", "The cassandra keyspace. The default value is empty string.")
 	flag.IntVar(&cassandraProtoclVersion, "cassandra-protocl-version", 0, "The cassandra protocl version. The default value is zero.")
 	flag.Parse()
+
+	consulConfigurationReader := config.ConsulConfigurationReader{ConsulAddress: consulAddress, ConsulScheme: consulScheme}
+
+	setConsulConfigurationValuesRequireToBeOverriden(&consulConfigurationReader)
+
+	endpoint := endpoint.Endpoint{ConfigurationReader: consulConfigurationReader}
+
+	cassandraHosts, err := consulConfigurationReader.GetCassandraHosts()
+
+	if err != nil {
+		log.Fatal(err.Error())
+
+		return
+	}
+
+	cassandraKeyspace, err := consulConfigurationReader.GetCassandraKeyspace()
+
+	if err != nil {
+		log.Fatal(err.Error())
+
+		return
+	}
+
+	cassandraProtocolVersion, err := consulConfigurationReader.GetCassandraProtocolVersion()
+
+	if err != nil {
+		log.Fatal(err.Error())
+
+		return
+	}
+
+	uuidGeneratorService := system.UUIDGeneratorServiceImpl{}
+
+	cluster := gocql.NewCluster()
+	cluster.Hosts = cassandraHosts
+	cluster.ProtoVersion = cassandraProtocolVersion
+	cluster.Keyspace = cassandraKeyspace
+	cluster.Consistency = gocql.Quorum
+
+	tenantDataService := dataService.TenantDataService{UUIDGeneratorService: &uuidGeneratorService, ClusterConfig: cluster}
+	tenantService := businessService.TenantService{TenantDataService: &tenantDataService}
+
+	endpoint.TenantService = tenantService
+
+	endpoint.StartServer()
+}
+
+func setConsulConfigurationValuesRequireToBeOverriden(consulConfigurationReader *config.ConsulConfigurationReader) {
+	diagnostics.IsNotNil(consulConfigurationReader, "consulConfigurationReader", "consulConfigurationReader is nil.")
+
+	if listeningPort != 0 {
+		consulConfigurationReader.ListeningPortToOverride = listeningPort
+	} else if port, err := strconv.Atoi(os.Getenv("PORT")); err == nil && port != 0 {
+		consulConfigurationReader.ListeningPortToOverride = port
+	}
+
+	if len(cassandraHosts) != 0 {
+		consulConfigurationReader.CassandraHostsToOverride = strings.Split(cassandraHosts, ",")
+	}
+
+	if len(cassandraKeyspace) != 0 {
+		consulConfigurationReader.CassandraKeyspaceToOverride = cassandraKeyspace
+	}
+
+	if cassandraProtoclVersion != 0 {
+		consulConfigurationReader.CassandraProtocolVersionToOverride = cassandraProtoclVersion
+	}
 }
