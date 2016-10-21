@@ -18,7 +18,7 @@ var _ = Describe("UpdateTenant method input parameters and dependency test", fun
 		mockCtrl                          *gomock.Controller
 		tenantService                     *service.TenantService
 		mockTenantDataService             *MockTenantDataService
-		tenantID                          system.UUID
+		validTenantID                     system.UUID
 		validTenant                       domain.Tenant
 		tenantWithEmptySecretKey          domain.Tenant
 		tenantWithWhitespaceOnlySecretKey domain.Tenant
@@ -30,7 +30,7 @@ var _ = Describe("UpdateTenant method input parameters and dependency test", fun
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 		validTenant = domain.Tenant{SecretKey: "Secret Key"}
 		tenantWithEmptySecretKey = domain.Tenant{SecretKey: ""}
 		tenantWithWhitespaceOnlySecretKey = domain.Tenant{SecretKey: "   "}
@@ -44,7 +44,7 @@ var _ = Describe("UpdateTenant method input parameters and dependency test", fun
 		It("should panic", func() {
 			tenantService.TenantDataService = nil
 
-			Ω(func() { tenantService.UpdateTenant(tenantID, validTenant) }).Should(Panic())
+			Ω(func() { tenantService.UpdateTenant(validTenantID, validTenant) }).Should(Panic())
 		})
 	})
 
@@ -54,11 +54,11 @@ var _ = Describe("UpdateTenant method input parameters and dependency test", fun
 		})
 
 		It("should panic when tenant with empty secret key provided", func() {
-			Ω(func() { tenantService.UpdateTenant(tenantID, tenantWithEmptySecretKey) }).Should(Panic())
+			Ω(func() { tenantService.UpdateTenant(validTenantID, tenantWithEmptySecretKey) }).Should(Panic())
 		})
 
 		It("should panic when tenant with secret key contains whitespace characters only provided", func() {
-			Ω(func() { tenantService.UpdateTenant(tenantID, tenantWithWhitespaceOnlySecretKey) }).Should(Panic())
+			Ω(func() { tenantService.UpdateTenant(validTenantID, tenantWithWhitespaceOnlySecretKey) }).Should(Panic())
 		})
 	})
 })
@@ -68,7 +68,7 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
 		mockTenantDataService *MockTenantDataService
-		tenantID              system.UUID
+		validTenantID         system.UUID
 		validTenant           domain.Tenant
 	)
 
@@ -78,7 +78,7 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 		validTenant = domain.Tenant{SecretKey: "Secret Key"}
 	})
 
@@ -89,9 +89,9 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 	It("should call tenant data service UpdateTenant function", func() {
 		mappedTenant := contract.Tenant{SecretKey: validTenant.SecretKey}
 
-		mockTenantDataService.EXPECT().UpdateTenant(tenantID, mappedTenant)
+		mockTenantDataService.EXPECT().UpdateTenant(validTenantID, mappedTenant)
 
-		tenantService.UpdateTenant(tenantID, validTenant)
+		tenantService.UpdateTenant(validTenantID, validTenant)
 	})
 
 	Context("when tenant data service succeeds to update the existing tenant", func() {
@@ -100,10 +100,10 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 
 			mockTenantDataService.
 				EXPECT().
-				UpdateTenant(tenantID, mappedTenant).
+				UpdateTenant(validTenantID, mappedTenant).
 				Return(nil)
 
-			err := tenantService.UpdateTenant(tenantID, validTenant)
+			err := tenantService.UpdateTenant(validTenantID, validTenant)
 
 			Expect(err).To(BeNil())
 		})
@@ -117,10 +117,10 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				UpdateTenant(tenantID, mappedTenant).
+				UpdateTenant(validTenantID, mappedTenant).
 				Return(expectedError)
 
-			err := tenantService.UpdateTenant(tenantID, validTenant)
+			err := tenantService.UpdateTenant(validTenantID, validTenant)
 
 			Expect(err).To(Equal(expectedError))
 		})

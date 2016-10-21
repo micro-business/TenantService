@@ -18,7 +18,7 @@ var _ = Describe("ReadTenant method input parameters and dependency test", func(
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
 		mockTenantDataService *MockTenantDataService
-		tenantID              system.UUID
+		validTenantID         system.UUID
 	)
 
 	BeforeEach(func() {
@@ -27,7 +27,7 @@ var _ = Describe("ReadTenant method input parameters and dependency test", func(
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -38,7 +38,7 @@ var _ = Describe("ReadTenant method input parameters and dependency test", func(
 		It("should panic", func() {
 			tenantService.TenantDataService = nil
 
-			Ω(func() { tenantService.ReadTenant(tenantID) }).Should(Panic())
+			Ω(func() { tenantService.ReadTenant(validTenantID) }).Should(Panic())
 		})
 	})
 
@@ -54,7 +54,7 @@ var _ = Describe("ReadTenant method behaviour", func() {
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
 		mockTenantDataService *MockTenantDataService
-		tenantID              system.UUID
+		validTenantID         system.UUID
 	)
 
 	BeforeEach(func() {
@@ -63,7 +63,7 @@ var _ = Describe("ReadTenant method behaviour", func() {
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -71,9 +71,9 @@ var _ = Describe("ReadTenant method behaviour", func() {
 	})
 
 	It("should call tenant data service ReadTenant function", func() {
-		mockTenantDataService.EXPECT().ReadTenant(tenantID)
+		mockTenantDataService.EXPECT().ReadTenant(validTenantID)
 
-		tenantService.ReadTenant(tenantID)
+		tenantService.ReadTenant(validTenantID)
 	})
 
 	Context("when tenant data service succeeds to read the requested tenant", func() {
@@ -83,10 +83,10 @@ var _ = Describe("ReadTenant method behaviour", func() {
 
 			mockTenantDataService.
 				EXPECT().
-				ReadTenant(tenantID).
+				ReadTenant(validTenantID).
 				Return(contract.Tenant{SecretKey: expectedTenant.SecretKey}, nil)
 
-			tenant, err := tenantService.ReadTenant(tenantID)
+			tenant, err := tenantService.ReadTenant(validTenantID)
 
 			Expect(tenant).To(Equal(expectedTenant))
 			Expect(err).To(BeNil())
@@ -99,10 +99,10 @@ var _ = Describe("ReadTenant method behaviour", func() {
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				ReadTenant(tenantID).
+				ReadTenant(validTenantID).
 				Return(contract.Tenant{}, expectedError)
 
-			expectedTenant, err := tenantService.ReadTenant(tenantID)
+			expectedTenant, err := tenantService.ReadTenant(validTenantID)
 
 			Expect(expectedTenant).To(Equal(domain.Tenant{}))
 			Expect(err).To(Equal(expectedError))

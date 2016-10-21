@@ -76,6 +76,13 @@ func createTenantKeyspaceAndAllRequiredTables(keyspace string) {
 			".tenant(tenant_id UUID, secret_key text," +
 			" PRIMARY KEY(tenant_id));").
 		Exec()).To(BeNil())
+
+	Expect(session.Query(
+		"CREATE TABLE " +
+			keyspace +
+			".application(tenant_id UUID, application_id UUID, name text," +
+			" PRIMARY KEY(tenant_id, application_id));").
+		Exec()).To(BeNil())
 }
 
 func dropKeyspace(keyspace string) {

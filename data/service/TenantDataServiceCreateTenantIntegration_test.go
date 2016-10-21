@@ -20,7 +20,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
 		mockUUIDGeneratorService *MockUUIDGeneratorService
-		tenantID                 system.UUID
+		validTenantID            system.UUID
 		validTenant              contract.Tenant
 		clusterConfig            *gocql.ClusterConfig
 	)
@@ -34,7 +34,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 
 		randomValue, _ := system.RandomUUID()
 		validTenant = contract.Tenant{SecretKey: randomValue.String()}
@@ -80,11 +80,11 @@ var _ = Describe("CreateTenant method behaviour", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(tenantID, nil)
+				Return(validTenantID, nil)
 
 			returnedTenantID, err := tenantDataService.CreateTenant(validTenant)
 
-			Expect(tenantID).To(Equal(returnedTenantID))
+			Expect(validTenantID).To(Equal(returnedTenantID))
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -101,7 +101,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 					" FROM tenant"+
 					" WHERE"+
 					" tenant_id = ?",
-				tenantID.String()).Iter()
+				validTenantID.String()).Iter()
 
 			defer iter.Close()
 

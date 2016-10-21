@@ -16,7 +16,7 @@ var _ = Describe("DeleteTenant method input parameters and dependency test", fun
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
 		mockTenantDataService *MockTenantDataService
-		tenantID              system.UUID
+		validTenantID         system.UUID
 	)
 
 	BeforeEach(func() {
@@ -25,7 +25,7 @@ var _ = Describe("DeleteTenant method input parameters and dependency test", fun
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -36,7 +36,7 @@ var _ = Describe("DeleteTenant method input parameters and dependency test", fun
 		It("should panic", func() {
 			tenantService.TenantDataService = nil
 
-			Ω(func() { tenantService.DeleteTenant(tenantID) }).Should(Panic())
+			Ω(func() { tenantService.DeleteTenant(validTenantID) }).Should(Panic())
 		})
 	})
 
@@ -52,7 +52,7 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
 		mockTenantDataService *MockTenantDataService
-		tenantID              system.UUID
+		validTenantID         system.UUID
 	)
 
 	BeforeEach(func() {
@@ -61,7 +61,7 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -69,19 +69,19 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 	})
 
 	It("should call tenant data service DeleteTenant function", func() {
-		mockTenantDataService.EXPECT().DeleteTenant(tenantID)
+		mockTenantDataService.EXPECT().DeleteTenant(validTenantID)
 
-		tenantService.DeleteTenant(tenantID)
+		tenantService.DeleteTenant(validTenantID)
 	})
 
 	Context("when tenant data service succeeds to delete the existing tenant", func() {
 		It("should return no error", func() {
 			mockTenantDataService.
 				EXPECT().
-				DeleteTenant(tenantID).
+				DeleteTenant(validTenantID).
 				Return(nil)
 
-			err := tenantService.DeleteTenant(tenantID)
+			err := tenantService.DeleteTenant(validTenantID)
 
 			Expect(err).To(BeNil())
 		})
@@ -93,10 +93,10 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				DeleteTenant(tenantID).
+				DeleteTenant(validTenantID).
 				Return(expectedError)
 
-			err := tenantService.DeleteTenant(tenantID)
+			err := tenantService.DeleteTenant(validTenantID)
 
 			Expect(err).To(Equal(expectedError))
 		})

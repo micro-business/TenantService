@@ -20,7 +20,7 @@ var _ = Describe("ReadTenant method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
 		mockUUIDGeneratorService *MockUUIDGeneratorService
-		tenantID                 system.UUID
+		validTenantID            system.UUID
 		clusterConfig            *gocql.ClusterConfig
 	)
 
@@ -33,7 +33,7 @@ var _ = Describe("ReadTenant method behaviour", func() {
 
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -41,16 +41,16 @@ var _ = Describe("ReadTenant method behaviour", func() {
 	})
 
 	It("should return error if tenant does not exist", func() {
-		_, err := tenantDataService.ReadTenant(tenantID)
+		_, err := tenantDataService.ReadTenant(validTenantID)
 
-		Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())))
+		Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", validTenantID.String())))
 	})
 
 	It("should return the existing tenant", func() {
 		mockUUIDGeneratorService.
 			EXPECT().
 			GenerateRandomUUID().
-			Return(tenantID, nil)
+			Return(validTenantID, nil)
 
 		randomValue, _ := system.RandomUUID()
 		expectedTenant := contract.Tenant{SecretKey: randomValue.String()}

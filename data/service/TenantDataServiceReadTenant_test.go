@@ -15,13 +15,13 @@ var _ = Describe("ReadTenant method input parameters and dependency test", func(
 	var (
 		mockCtrl          *gomock.Controller
 		tenantDataService *service.TenantDataService
-		tenantID          system.UUID
+		validTenantID     system.UUID
 	)
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		tenantDataService = &service.TenantDataService{ClusterConfig: &gocql.ClusterConfig{}}
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -32,7 +32,7 @@ var _ = Describe("ReadTenant method input parameters and dependency test", func(
 		It("should panic", func() {
 			tenantDataService.ClusterConfig = nil
 
-			Ω(func() { tenantDataService.ReadTenant(tenantID) }).Should(Panic())
+			Ω(func() { tenantDataService.ReadTenant(validTenantID) }).Should(Panic())
 		})
 	})
 })

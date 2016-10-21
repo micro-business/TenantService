@@ -20,7 +20,7 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
 		mockUUIDGeneratorService *MockUUIDGeneratorService
-		tenantID                 system.UUID
+		validTenantID            system.UUID
 		validTenant              contract.Tenant
 		clusterConfig            *gocql.ClusterConfig
 	)
@@ -34,7 +34,7 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 
 		randomValue, _ := system.RandomUUID()
 		validTenant = contract.Tenant{SecretKey: randomValue.String()}
@@ -46,16 +46,16 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 
 	Context("when updating an existing tenant", func() {
 		It("should return error if tenant does not exist", func() {
-			err := tenantDataService.UpdateTenant(tenantID, validTenant)
+			err := tenantDataService.UpdateTenant(validTenantID, validTenant)
 
-			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())))
+			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", validTenantID.String())))
 		})
 
 		It("should update the record in tenant table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(tenantID, nil)
+				Return(validTenantID, nil)
 
 			returnedTenantID, err := tenantDataService.CreateTenant(validTenant)
 
@@ -82,7 +82,7 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 					" FROM tenant"+
 					" WHERE"+
 					" tenant_id = ?",
-				tenantID.String()).Iter()
+				validTenantID.String()).Iter()
 
 			defer iter.Close()
 

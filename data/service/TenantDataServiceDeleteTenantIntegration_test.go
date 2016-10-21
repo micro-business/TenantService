@@ -20,7 +20,7 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
 		mockUUIDGeneratorService *MockUUIDGeneratorService
-		tenantID                 system.UUID
+		validTenantID            system.UUID
 		validTenant              contract.Tenant
 		clusterConfig            *gocql.ClusterConfig
 	)
@@ -34,7 +34,7 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
 
-		tenantID, _ = system.RandomUUID()
+		validTenantID, _ = system.RandomUUID()
 
 		randomValue, _ := system.RandomUUID()
 		validTenant = contract.Tenant{SecretKey: randomValue.String()}
@@ -46,16 +46,16 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 
 	Context("when deleting existing tenant", func() {
 		It("should return error if tenant does not exist", func() {
-			err := tenantDataService.DeleteTenant(tenantID)
+			err := tenantDataService.DeleteTenant(validTenantID)
 
-			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())))
+			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", validTenantID.String())))
 		})
 
 		It("should remove the record from tenant table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(tenantID, nil)
+				Return(validTenantID, nil)
 
 			returnedTenantID, err := tenantDataService.CreateTenant(validTenant)
 
