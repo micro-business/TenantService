@@ -114,7 +114,30 @@ func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
 // application: Mandatory. The reference to the new application to create for the provided tenant
 // Returns either the unique identifier of the new application or error if something goes wrong.
 func (tenantDataService TenantDataService) CreateApplication(tenantID system.UUID, application contract.Application) (system.UUID, error) {
-	panic("Not implemented")
+	diagnostics.IsNotNil(tenantDataService.UUIDGeneratorService, "tenantDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
+	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
+
+	session, err := tenantDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return system.EmptyUUID, err
+	}
+
+	defer session.Close()
+
+	if !doesTenantExist(tenantID, session) {
+		return system.EmptyUUID, fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
+	}
+
+	applicationID, err := tenantDataService.UUIDGeneratorService.GenerateRandomUUID()
+
+	if err != nil {
+		return system.EmptyUUID, err
+	}
+
+	err = addNewApplication(tenantID, applicationID, application, session)
+
+	return applicationID, err
 }
 
 // Update updates an existing tenant application.
@@ -123,7 +146,23 @@ func (tenantDataService TenantDataService) CreateApplication(tenantID system.UUI
 // application: Mandatory. The reference to the updated application information.
 // Returns error if something goes wrong.
 func (tenantDataService TenantDataService) UpdateApplication(tenantID system.UUID, applicationID system.UUID, application contract.Application) error {
-	panic("Not implemented")
+	session, err := tenantDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return err
+	}
+
+	defer session.Close()
+
+	if !doesTenantExist(tenantID, session) {
+		return fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
+	}
+
+	if !doesApplicationExist(tenantID, applicationID, session) {
+		return fmt.Errorf("Tenant Application not found. Tenant ID: %s, Application ID: %s", tenantID.String(), applicationID.String())
+	}
+
+	return addNewApplication(tenantID, applicationID, application, session)
 }
 
 // Read retrieves an existing tenant information.
@@ -131,7 +170,19 @@ func (tenantDataService TenantDataService) UpdateApplication(tenantID system.UUI
 // applicationID: Mandatory: The unique identifier of the existing application.
 // Returns either the tenant application information or error if something goes wrong.
 func (tenantDataService TenantDataService) ReadApplication(tenantID system.UUID, applicationID system.UUID) (contract.Application, error) {
-	panic("Not implemented")
+	session, err := tenantDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return contract.Application{}, err
+	}
+
+	defer session.Close()
+
+	if !doesTenantExist(tenantID, session) {
+		return contract.Application{}, fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
+	}
+
+	return readApplication(tenantID, applicationID, session)
 }
 
 // Delete deletes an existing tenant application information.
@@ -139,7 +190,33 @@ func (tenantDataService TenantDataService) ReadApplication(tenantID system.UUID,
 // applicationID: Mandatory: The unique identifier of the existing application.
 // Returns error if something goes wrong.
 func (tenantDataService TenantDataService) DeleteApplication(tenantID system.UUID, applicationID system.UUID) error {
-	panic("Not implemented")
+	session, err := tenantDataService.ClusterConfig.CreateSession()
+
+	if err != nil {
+		return err
+	}
+
+	defer session.Close()
+
+	if !doesTenantExist(tenantID, session) {
+		return fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
+	}
+
+	if !doesApplicationExist(tenantID, applicationID, session) {
+		return fmt.Errorf("Tenant Application not found. Tenant ID: %s, Application ID: %s", tenantID.String(), applicationID.String())
+	}
+
+	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
+	mappedApplicationID := mapSystemUUIDToGocqlUUID(applicationID)
+
+	return session.Query(
+		"DELETE FROM application"+
+			" WHERE"+
+			" tenant_id = ?"+
+			" AND application_id = ?",
+		mappedTenantID,
+		mappedApplicationID).
+		Exec()
 }
 
 // mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
@@ -195,7 +272,43 @@ func doesTenantExist(tenantID system.UUID, session *gocql.Session) bool {
 	return iter.Scan(&secretKey)
 }
 
-// doesTenantExist checks whether the provided tenant exists in database
+// addNewApplication adds new qpplication to tenant application table
+func addNewApplication(tenantID, applicationID system.UUID, application contract.Application, session *gocql.Session) error {
+	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
+	mappedApplicationID := mapSystemUUIDToGocqlUUID(applicationID)
+
+	return session.Query(
+		"INSERT INTO application"+
+			" (tenant_id, application_, name)"+
+			" VALUES(?, ?, ?)",
+		mappedTenantID,
+		mappedApplicationID,
+		application.Name).
+		Exec()
+}
+
+// readApplication takes the provided tenantID and applicationID and tries to read the tenant application information from database
+func readApplication(tenantID, applicationID system.UUID, session *gocql.Session) (contract.Application, error) {
+	iter := session.Query(
+		"SELECT name"+
+			" FROM application"+
+			" WHERE"+
+			" tenant_id = ?"+
+			" AND application_id = ?",
+		tenantID.String(),
+		applicationID.String()).Iter()
+
+	application := contract.Application{}
+
+	if !iter.Scan(&application.Name) {
+		return contract.Application{}, fmt.Errorf("Tenant Application not found. Tenant ID: %s, Application ID: %s", tenantID.String(), applicationID.String())
+	}
+
+	return application, nil
+
+}
+
+// doesApplicationExist checks whether the provided tenant application exists in database
 func doesApplicationExist(tenantID system.UUID, applicationID system.UUID, session *gocql.Session) bool {
 	iter := session.Query(
 		"SELECT name"+
