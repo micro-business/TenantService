@@ -10,6 +10,8 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/microbusinesses/TenantService/data/contract"
+	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -83,6 +85,18 @@ func createTenantKeyspaceAndAllRequiredTables(keyspace string) {
 			".application(tenant_id UUID, application_id UUID, name text," +
 			" PRIMARY KEY(tenant_id, application_id));").
 		Exec()).To(BeNil())
+}
+
+func createTenant(keyspace string) (system.UUID, error) {
+	clusterConfig := getClusterConfig()
+	clusterConfig.Keyspace = keyspace
+
+	tenantDataService := &service.TenantDataService{UUIDGeneratorService: system.UUIDGeneratorServiceImpl{}, ClusterConfig: clusterConfig}
+
+	randomValue, _ := system.RandomUUID()
+	validTenant := contract.Tenant{SecretKey: randomValue.String()}
+
+	return tenantDataService.CreateTenant(validTenant)
 }
 
 func dropKeyspace(keyspace string) {
