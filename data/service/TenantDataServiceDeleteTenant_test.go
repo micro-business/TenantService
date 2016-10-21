@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Delete method input parameters and dependency test", func() {
+var _ = Describe("DeleteTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl          *gomock.Controller
 		tenantDataService *service.TenantDataService
@@ -33,12 +33,12 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 		It("should panic", func() {
 			tenantDataService.ClusterConfig = nil
 
-			Ω(func() { tenantDataService.Delete(tenantID) }).Should(Panic())
+			Ω(func() { tenantDataService.DeleteTenant(tenantID) }).Should(Panic())
 		})
 	})
 })
 
-func TestDelete(t *testing.T) {
+func TestDeleteTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Delete method input parameters and dependency test")
+	RunSpecs(t, "DeleteTenant method input parameters and dependency test")
 }

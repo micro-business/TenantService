@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Create method input parameters and dependency test", func() {
+var _ = Describe("CreateTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
@@ -37,7 +37,7 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		It("should panic", func() {
 			tenantDataService.UUIDGeneratorService = nil
 
-			Ω(func() { tenantDataService.Create(validTenant) }).Should(Panic())
+			Ω(func() { tenantDataService.CreateTenant(validTenant) }).Should(Panic())
 		})
 	})
 
@@ -45,12 +45,12 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 		It("should panic", func() {
 			tenantDataService.ClusterConfig = nil
 
-			Ω(func() { tenantDataService.Create(validTenant) }).Should(Panic())
+			Ω(func() { tenantDataService.CreateTenant(validTenant) }).Should(Panic())
 		})
 	})
 })
 
-func TestCreate(t *testing.T) {
+func TestCreateTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Create method input parameters and dependency test")
+	RunSpecs(t, "CreateTenant method input parameters and dependency test")
 }

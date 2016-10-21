@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Update method behaviour", func() {
+var _ = Describe("DeleteTenant method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
@@ -44,27 +44,24 @@ var _ = Describe("Update method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	Context("when updating an existing tenant", func() {
+	Context("when deleting existing tenant", func() {
 		It("should return error if tenant does not exist", func() {
-			err := tenantDataService.Update(tenantID, validTenant)
+			err := tenantDataService.DeleteTenant(tenantID)
 
 			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())))
 		})
 
-		It("should update the record in tenant table", func() {
+		It("should remove the record from tenant table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
 				Return(tenantID, nil)
 
-			returnedTenantID, err := tenantDataService.Create(validTenant)
+			returnedTenantID, err := tenantDataService.CreateTenant(validTenant)
 
 			Expect(err).To(BeNil())
 
-			randomValue, _ := system.RandomUUID()
-			updatedTenant := contract.Tenant{SecretKey: randomValue.String()}
-
-			err = tenantDataService.Update(returnedTenantID, updatedTenant)
+			err = tenantDataService.DeleteTenant(returnedTenantID)
 
 			Expect(err).To(BeNil())
 
@@ -77,24 +74,23 @@ var _ = Describe("Update method behaviour", func() {
 
 			defer session.Close()
 
+			var secretKey string
+
 			iter := session.Query(
 				"SELECT secret_key"+
 					" FROM tenant"+
 					" WHERE"+
 					" tenant_id = ?",
-				tenantID.String()).Iter()
+				returnedTenantID.String()).Iter()
 
 			defer iter.Close()
 
-			var secretKey string
-
-			Expect(iter.Scan(&secretKey)).To(BeTrue())
-			Expect(updatedTenant.SecretKey).To(Equal(secretKey))
+			Expect(iter.Scan(&secretKey)).To(BeFalse())
 		})
 	})
 })
 
-func TestUpdateBehaviour(t *testing.T) {
+func TestDeleteTenantBehaviour(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Update method behaviour")
+	RunSpecs(t, "DeleteTenant method behaviour")
 }

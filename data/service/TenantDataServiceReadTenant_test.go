@@ -6,27 +6,22 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/data/contract"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Update method input parameters and dependency test", func() {
+var _ = Describe("ReadTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl          *gomock.Controller
 		tenantDataService *service.TenantDataService
-		validTenantID     system.UUID
-		validTenant       contract.Tenant
+		tenantID          system.UUID
 	)
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		tenantDataService = &service.TenantDataService{ClusterConfig: &gocql.ClusterConfig{}}
-		validTenantID, _ = system.RandomUUID()
-
-		randomValue, _ := system.RandomUUID()
-		validTenant = contract.Tenant{SecretKey: randomValue.String()}
+		tenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -37,12 +32,12 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 		It("should panic", func() {
 			tenantDataService.ClusterConfig = nil
 
-			Ω(func() { tenantDataService.Update(validTenantID, validTenant) }).Should(Panic())
+			Ω(func() { tenantDataService.ReadTenant(tenantID) }).Should(Panic())
 		})
 	})
 })
 
-func TestUpdate(t *testing.T) {
+func TestReadTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Update method input parameters and dependency test")
+	RunSpecs(t, "ReadTenant method input parameters and dependency test")
 }

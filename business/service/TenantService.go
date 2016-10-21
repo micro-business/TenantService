@@ -20,7 +20,7 @@ func (tenantService TenantService) Create(tenant domain.Tenant) (system.UUID, er
 
 	validateTenant(tenant)
 
-	return tenantService.TenantDataService.Create(mapToDataTenant(tenant))
+	return tenantService.TenantDataService.CreateTenant(mapToDataTenant(tenant))
 }
 
 // Update updates an existing tenant.
@@ -33,7 +33,7 @@ func (tenantService TenantService) Update(tenantID system.UUID, tenant domain.Te
 
 	validateTenant(tenant)
 
-	return tenantService.TenantDataService.Update(tenantID, mapToDataTenant(tenant))
+	return tenantService.TenantDataService.UpdateTenant(tenantID, mapToDataTenant(tenant))
 }
 
 // Read retrieves an existing tenant.
@@ -43,7 +43,7 @@ func (tenantService TenantService) Read(tenantID system.UUID) (domain.Tenant, er
 	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
-	tenant, err := tenantService.TenantDataService.Read(tenantID)
+	tenant, err := tenantService.TenantDataService.ReadTenant(tenantID)
 
 	if err != nil {
 		return domain.Tenant{}, err
@@ -59,7 +59,7 @@ func (tenantService TenantService) Delete(tenantID system.UUID) error {
 	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
-	return tenantService.TenantDataService.Delete(tenantID)
+	return tenantService.TenantDataService.DeleteTenant(tenantID)
 }
 
 // validateTenant validates the tenant domain object and make sure the data is consistent and valid.

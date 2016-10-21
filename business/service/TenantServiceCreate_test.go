@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Create method input parameters and dependency test", func() {
+var _ = Describe("CreateTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl                          *gomock.Controller
 		tenantService                     *service.TenantService
@@ -57,7 +57,7 @@ var _ = Describe("Create method input parameters and dependency test", func() {
 	})
 })
 
-var _ = Describe("Create method behaviour", func() {
+var _ = Describe("CreateTenant method behaviour", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -78,10 +78,10 @@ var _ = Describe("Create method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should call tenant data service Create function", func() {
+	It("should call tenant data service CreateTenant function", func() {
 		mappedTenant := contract.Tenant{SecretKey: validTenant.SecretKey}
 
-		mockTenantDataService.EXPECT().Create(mappedTenant)
+		mockTenantDataService.EXPECT().CreateTenant(mappedTenant)
 
 		tenantService.Create(validTenant)
 	})
@@ -94,7 +94,7 @@ var _ = Describe("Create method behaviour", func() {
 			expectedTenantID, _ := system.RandomUUID()
 			mockTenantDataService.
 				EXPECT().
-				Create(mappedTenant).
+				CreateTenant(mappedTenant).
 				Return(expectedTenantID, nil)
 
 			newTenantID, err := tenantService.Create(domain.Tenant{SecretKey: key.String()})
@@ -112,7 +112,7 @@ var _ = Describe("Create method behaviour", func() {
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				Create(mappedTenant).
+				CreateTenant(mappedTenant).
 				Return(system.EmptyUUID, expectedError)
 
 			newTenantID, err := tenantService.Create(validTenant)
@@ -123,8 +123,8 @@ var _ = Describe("Create method behaviour", func() {
 	})
 })
 
-func TestCreate(t *testing.T) {
+func TestCreateTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Create method input parameters and dependency test")
-	RunSpecs(t, "Create method behaviour")
+	RunSpecs(t, "CreateTenant method input parameters and dependency test")
+	RunSpecs(t, "CreateTenant method behaviour")
 }

@@ -3,7 +3,7 @@
 package service_test
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/gocql/gocql"
@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Delete method behaviour", func() {
+var _ = Describe("CreateTenant method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
@@ -44,25 +44,47 @@ var _ = Describe("Delete method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	Context("when deleting existing tenant", func() {
-		It("should return error if tenant does not exist", func() {
-			err := tenantDataService.Delete(tenantID)
+	Context("when UUID generator service succeeds to create the new UUID", func() {
+		It("should return the new UUID as tenant uniuqe identifier and no error", func() {
+			expectedTenantID, _ := system.RandomUUID()
+			mockUUIDGeneratorService.
+				EXPECT().
+				GenerateRandomUUID().
+				Return(expectedTenantID, nil)
 
-			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())))
+			newTenantID, err := tenantDataService.CreateTenant(validTenant)
+
+			Expect(expectedTenantID).To(Equal(newTenantID))
+			Expect(err).To(BeNil())
 		})
+	})
 
-		It("should remove the record from tenant table", func() {
+	Context("when UUID generator service fails to create the new UUID", func() {
+		It("should return tenant unique identifier as empty UUID and the returned error by tenant data service", func() {
+			expectedErrorID, _ := system.RandomUUID()
+			expectedError := errors.New(expectedErrorID.String())
+			mockUUIDGeneratorService.
+				EXPECT().
+				GenerateRandomUUID().
+				Return(system.EmptyUUID, expectedError)
+
+			newTenantID, err := tenantDataService.CreateTenant(validTenant)
+
+			Expect(newTenantID).To(Equal(system.EmptyUUID))
+			Expect(err).To(Equal(expectedError))
+		})
+	})
+
+	Context("when creating new tenant", func() {
+		It("should insert the record into tenant table", func() {
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
 				Return(tenantID, nil)
 
-			returnedTenantID, err := tenantDataService.Create(validTenant)
+			returnedTenantID, err := tenantDataService.CreateTenant(validTenant)
 
-			Expect(err).To(BeNil())
-
-			err = tenantDataService.Delete(returnedTenantID)
-
+			Expect(tenantID).To(Equal(returnedTenantID))
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -74,23 +96,24 @@ var _ = Describe("Delete method behaviour", func() {
 
 			defer session.Close()
 
-			var secretKey string
-
 			iter := session.Query(
 				"SELECT secret_key"+
 					" FROM tenant"+
 					" WHERE"+
 					" tenant_id = ?",
-				returnedTenantID.String()).Iter()
+				tenantID.String()).Iter()
 
 			defer iter.Close()
 
-			Expect(iter.Scan(&secretKey)).To(BeFalse())
+			var secretKey string
+
+			Expect(iter.Scan(&secretKey)).To(BeTrue())
+			Expect(validTenant.SecretKey).To(Equal(secretKey))
 		})
 	})
 })
 
-func TestDeleteBehaviour(t *testing.T) {
+func TestCreateTenantBehaviour(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Delete method behaviour")
+	RunSpecs(t, "CreateTenant method behaviour")
 }

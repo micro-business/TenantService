@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Read method input parameters and dependency test", func() {
+var _ = Describe("ReadTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -49,7 +49,7 @@ var _ = Describe("Read method input parameters and dependency test", func() {
 	})
 })
 
-var _ = Describe("Read method behaviour", func() {
+var _ = Describe("ReadTenant method behaviour", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -70,8 +70,8 @@ var _ = Describe("Read method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should call tenant data service Read function", func() {
-		mockTenantDataService.EXPECT().Read(tenantID)
+	It("should call tenant data service ReadTenant function", func() {
+		mockTenantDataService.EXPECT().ReadTenant(tenantID)
 
 		tenantService.Read(tenantID)
 	})
@@ -83,7 +83,7 @@ var _ = Describe("Read method behaviour", func() {
 
 			mockTenantDataService.
 				EXPECT().
-				Read(tenantID).
+				ReadTenant(tenantID).
 				Return(contract.Tenant{SecretKey: expectedTenant.SecretKey}, nil)
 
 			tenant, err := tenantService.Read(tenantID)
@@ -99,7 +99,7 @@ var _ = Describe("Read method behaviour", func() {
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				Read(tenantID).
+				ReadTenant(tenantID).
 				Return(contract.Tenant{}, expectedError)
 
 			expectedTenant, err := tenantService.Read(tenantID)
@@ -110,8 +110,8 @@ var _ = Describe("Read method behaviour", func() {
 	})
 })
 
-func TestRead(t *testing.T) {
+func TestReadTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Read method input parameters and dependency test")
-	RunSpecs(t, "Read method behaviour")
+	RunSpecs(t, "ReadTenant method input parameters and dependency test")
+	RunSpecs(t, "ReadTenant method behaviour")
 }

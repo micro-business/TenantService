@@ -30,46 +30,46 @@ func (_m *MockTenantDataService) EXPECT() *_MockTenantDataServiceRecorder {
 	return _m.recorder
 }
 
-func (_m *MockTenantDataService) Create(tenant Tenant) (system.UUID, error) {
-	ret := _m.ctrl.Call(_m, "Create", tenant)
+func (_m *MockTenantDataService) CreateTenant(tenant Tenant) (system.UUID, error) {
+	ret := _m.ctrl.Call(_m, "CreateTenant", tenant)
 	ret0, _ := ret[0].(system.UUID)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockTenantDataServiceRecorder) Create(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Create", arg0)
+func (_mr *_MockTenantDataServiceRecorder) CreateTenant(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "CreateTenant", arg0)
 }
 
-func (_m *MockTenantDataService) Update(tenantID system.UUID, tenant Tenant) error {
-	ret := _m.ctrl.Call(_m, "Update", tenantID, tenant)
+func (_m *MockTenantDataService) UpdateTenant(tenantID system.UUID, tenant Tenant) error {
+	ret := _m.ctrl.Call(_m, "UpdateTenant", tenantID, tenant)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-func (_mr *_MockTenantDataServiceRecorder) Update(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Update", arg0, arg1)
+func (_mr *_MockTenantDataServiceRecorder) UpdateTenant(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "UpdateTenant", arg0, arg1)
 }
 
-func (_m *MockTenantDataService) Read(tenantID system.UUID) (Tenant, error) {
-	ret := _m.ctrl.Call(_m, "Read", tenantID)
+func (_m *MockTenantDataService) ReadTenant(tenantID system.UUID) (Tenant, error) {
+	ret := _m.ctrl.Call(_m, "ReadTenant", tenantID)
 	ret0, _ := ret[0].(Tenant)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockTenantDataServiceRecorder) Read(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Read", arg0)
+func (_mr *_MockTenantDataServiceRecorder) ReadTenant(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "ReadTenant", arg0)
 }
 
-func (_m *MockTenantDataService) Delete(tenantID system.UUID) error {
-	ret := _m.ctrl.Call(_m, "Delete", tenantID)
+func (_m *MockTenantDataService) DeleteTenant(tenantID system.UUID) error {
+	ret := _m.ctrl.Call(_m, "DeleteTenant", tenantID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-func (_mr *_MockTenantDataServiceRecorder) Delete(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Delete", arg0)
+func (_mr *_MockTenantDataServiceRecorder) DeleteTenant(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteTenant", arg0)
 }
 
 func (_m *MockTenantDataService) CreateApplication(tenantID system.UUID, application Application) (system.UUID, error) {

@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Delete method input parameters and dependency test", func() {
+var _ = Describe("DeleteTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -47,7 +47,7 @@ var _ = Describe("Delete method input parameters and dependency test", func() {
 	})
 })
 
-var _ = Describe("Delete method behaviour", func() {
+var _ = Describe("DeleteTenant method behaviour", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -68,8 +68,8 @@ var _ = Describe("Delete method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should call tenant data service Delete function", func() {
-		mockTenantDataService.EXPECT().Delete(tenantID)
+	It("should call tenant data service DeleteTenant function", func() {
+		mockTenantDataService.EXPECT().DeleteTenant(tenantID)
 
 		tenantService.Delete(tenantID)
 	})
@@ -78,7 +78,7 @@ var _ = Describe("Delete method behaviour", func() {
 		It("should return no error", func() {
 			mockTenantDataService.
 				EXPECT().
-				Delete(tenantID).
+				DeleteTenant(tenantID).
 				Return(nil)
 
 			err := tenantService.Delete(tenantID)
@@ -93,7 +93,7 @@ var _ = Describe("Delete method behaviour", func() {
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				Delete(tenantID).
+				DeleteTenant(tenantID).
 				Return(expectedError)
 
 			err := tenantService.Delete(tenantID)
@@ -103,8 +103,8 @@ var _ = Describe("Delete method behaviour", func() {
 	})
 })
 
-func TestDelete(t *testing.T) {
+func TestDeleteTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Delete method input parameters and dependency test")
-	RunSpecs(t, "Delete method behaviour")
+	RunSpecs(t, "DeleteTenant method input parameters and dependency test")
+	RunSpecs(t, "DeleteTenant method behaviour")
 }

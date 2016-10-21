@@ -15,10 +15,10 @@ type TenantDataService struct {
 	ClusterConfig        *gocql.ClusterConfig
 }
 
-// Create creates a new tenant.
+// CreateTenant  creates a new tenant.
 // tenant: Mandatory. The reference to the new tenant information
 // Returns either the unique identifier of the new tenant or error if something goes wrong.
-func (tenantDataService TenantDataService) Create(tenant contract.Tenant) (system.UUID, error) {
+func (tenantDataService TenantDataService) CreateTenant(tenant contract.Tenant) (system.UUID, error) {
 	diagnostics.IsNotNil(tenantDataService.UUIDGeneratorService, "tenantDataService.UUIDGeneratorService", "UUIDGeneratorService must be provided.")
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
 
@@ -41,11 +41,11 @@ func (tenantDataService TenantDataService) Create(tenant contract.Tenant) (syste
 	return tenantID, err
 }
 
-// Update updates an existing tenant.
+// UpdateTenant updates an existing tenant.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // tenant: Mandatory. The reference to the updated tenant information.
 // Returns error if something goes wrong.
-func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant contract.Tenant) error {
+func (tenantDataService TenantDataService) UpdateTenant(tenantID system.UUID, tenant contract.Tenant) error {
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
 
 	session, err := tenantDataService.ClusterConfig.CreateSession()
@@ -63,10 +63,10 @@ func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant c
 	return addNewTenant(tenantID, tenant, session)
 }
 
-// Read retrieves an existing tenant.
+// ReadTenant retrieves an existing tenant.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // Returns either the tenant information or error if something goes wrong.
-func (tenantDataService TenantDataService) Read(tenantID system.UUID) (contract.Tenant, error) {
+func (tenantDataService TenantDataService) ReadTenant(tenantID system.UUID) (contract.Tenant, error) {
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
 
 	session, err := tenantDataService.ClusterConfig.CreateSession()
@@ -81,10 +81,10 @@ func (tenantDataService TenantDataService) Read(tenantID system.UUID) (contract.
 
 }
 
-// Delete deletes an existing tenant information.
+// DeleteTenant deletes an existing tenant information.
 // tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 // Returns error if something goes wrong.
-func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
+func (tenantDataService TenantDataService) DeleteTenant(tenantID system.UUID) error {
 	diagnostics.IsNotNil(tenantDataService.ClusterConfig, "tenantDataServic.ClusterConfig", "ClusterConfig must be provided.")
 
 	session, err := tenantDataService.ClusterConfig.CreateSession()
@@ -140,7 +140,7 @@ func (tenantDataService TenantDataService) CreateApplication(tenantID system.UUI
 	return applicationID, err
 }
 
-// Update updates an existing tenant application.
+// UpdateApplication updates an existing tenant application.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // applicationID: Mandatory: The unique identifier of the existing application.
 // application: Mandatory. The reference to the updated application information.
@@ -165,7 +165,7 @@ func (tenantDataService TenantDataService) UpdateApplication(tenantID system.UUI
 	return addNewApplication(tenantID, applicationID, application, session)
 }
 
-// Read retrieves an existing tenant information.
+// ReadApplication retrieves an existing tenant information.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // applicationID: Mandatory: The unique identifier of the existing application.
 // Returns either the tenant application information or error if something goes wrong.
@@ -185,7 +185,7 @@ func (tenantDataService TenantDataService) ReadApplication(tenantID system.UUID,
 	return readApplication(tenantID, applicationID, session)
 }
 
-// Delete deletes an existing tenant application information.
+// DeleteApplication deletes an existing tenant application information.
 // tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 // applicationID: Mandatory: The unique identifier of the existing application.
 // Returns error if something goes wrong.

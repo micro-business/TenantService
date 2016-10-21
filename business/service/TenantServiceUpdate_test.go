@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Update method input parameters and dependency test", func() {
+var _ = Describe("UpdateTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl                          *gomock.Controller
 		tenantService                     *service.TenantService
@@ -63,7 +63,7 @@ var _ = Describe("Update method input parameters and dependency test", func() {
 	})
 })
 
-var _ = Describe("Update method behaviour", func() {
+var _ = Describe("UpdateTenant method behaviour", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -86,10 +86,10 @@ var _ = Describe("Update method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should call tenant data service Update function", func() {
+	It("should call tenant data service UpdateTenant function", func() {
 		mappedTenant := contract.Tenant{SecretKey: validTenant.SecretKey}
 
-		mockTenantDataService.EXPECT().Update(tenantID, mappedTenant)
+		mockTenantDataService.EXPECT().UpdateTenant(tenantID, mappedTenant)
 
 		tenantService.Update(tenantID, validTenant)
 	})
@@ -100,7 +100,7 @@ var _ = Describe("Update method behaviour", func() {
 
 			mockTenantDataService.
 				EXPECT().
-				Update(tenantID, mappedTenant).
+				UpdateTenant(tenantID, mappedTenant).
 				Return(nil)
 
 			err := tenantService.Update(tenantID, validTenant)
@@ -117,7 +117,7 @@ var _ = Describe("Update method behaviour", func() {
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				Update(tenantID, mappedTenant).
+				UpdateTenant(tenantID, mappedTenant).
 				Return(expectedError)
 
 			err := tenantService.Update(tenantID, validTenant)
@@ -127,8 +127,8 @@ var _ = Describe("Update method behaviour", func() {
 	})
 })
 
-func TestUpdate(t *testing.T) {
+func TestUpdateTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Update method input parameters and dependency test")
-	RunSpecs(t, "Update method behaviour")
+	RunSpecs(t, "UpdateTenant method input parameters and dependency test")
+	RunSpecs(t, "UpdateTenant method behaviour")
 }

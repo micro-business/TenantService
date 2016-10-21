@@ -15,7 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ReadAll method behaviour", func() {
+var _ = Describe("ReadTenant method behaviour", func() {
 	var (
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
@@ -41,7 +41,7 @@ var _ = Describe("ReadAll method behaviour", func() {
 	})
 
 	It("should return error if tenant does not exist", func() {
-		_, err := tenantDataService.Read(tenantID)
+		_, err := tenantDataService.ReadTenant(tenantID)
 
 		Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())))
 	})
@@ -54,18 +54,18 @@ var _ = Describe("ReadAll method behaviour", func() {
 
 		randomValue, _ := system.RandomUUID()
 		expectedTenant := contract.Tenant{SecretKey: randomValue.String()}
-		returnedTenantID, err := tenantDataService.Create(expectedTenant)
+		returnedTenantID, err := tenantDataService.CreateTenant(expectedTenant)
 
 		Expect(err).To(BeNil())
 
-		returnedTenant, err := tenantDataService.Read(returnedTenantID)
+		returnedTenant, err := tenantDataService.ReadTenant(returnedTenantID)
 
 		Expect(err).To(BeNil())
 		Expect(expectedTenant).To(Equal(returnedTenant))
 	})
 })
 
-func TestReadAllBehaviour(t *testing.T) {
+func TestReadTenantBehaviour(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "ReadAll method behaviour")
+	RunSpecs(t, "ReadTenant method behaviour")
 }
