@@ -28,4 +28,29 @@ type TenantService interface {
 	// tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 	// Returns error if something goes wrong.
 	DeleteTenant(tenantID system.UUID) error
+
+	// CreateApplication creates new application for the provided tenant.
+	// tenantID: Mandatory. The unique identifier of the tenant to create the application for.
+	// application: Mandatory. The reference to the new application to create for the provided tenant
+	// Returns either the unique identifier of the new application or error if something goes wrong.
+	CreateApplication(tenantID system.UUID, application domain.Application) (system.UUID, error)
+
+	// Update updates an existing tenant application.
+	// tenantID: Mandatory: The unique identifier of the existing tenant.
+	// applicationID: Mandatory: The unique identifier of the existing application.
+	// application: Mandatory. The reference to the updated application information.
+	// Returns error if something goes wrong.
+	UpdateApplication(tenantID system.UUID, applicationID system.UUID, application domain.Application) error
+
+	// Read retrieves an existing tenant information.
+	// tenantID: Mandatory: The unique identifier of the existing tenant.
+	// applicationID: Mandatory: The unique identifier of the existing application.
+	// Returns either the tenant application information or error if something goes wrong.
+	ReadApplication(tenantID system.UUID, applicationID system.UUID) (domain.Application, error)
+
+	// Delete deletes an existing tenant application information.
+	// tenantID: Mandatory: The unique identifier of the existing tenant to remove.
+	// applicationID: Mandatory: The unique identifier of the existing application.
+	// Returns error if something goes wrong.
+	DeleteApplication(tenantID system.UUID, applicationID system.UUID) error
 }

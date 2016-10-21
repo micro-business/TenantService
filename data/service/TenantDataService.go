@@ -36,7 +36,7 @@ func (tenantDataService TenantDataService) CreateTenant(tenant contract.Tenant) 
 
 	defer session.Close()
 
-	err = addNewTenant(tenantID, tenant, session)
+	err = addOrUpdateTenant(tenantID, tenant, session)
 
 	return tenantID, err
 }
@@ -60,7 +60,7 @@ func (tenantDataService TenantDataService) UpdateTenant(tenantID system.UUID, te
 		return fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
 	}
 
-	return addNewTenant(tenantID, tenant, session)
+	return addOrUpdateTenant(tenantID, tenant, session)
 }
 
 // ReadTenant retrieves an existing tenant.
@@ -135,7 +135,7 @@ func (tenantDataService TenantDataService) CreateApplication(tenantID system.UUI
 		return system.EmptyUUID, err
 	}
 
-	err = addNewApplication(tenantID, applicationID, application, session)
+	err = addOrUpdateApplication(tenantID, applicationID, application, session)
 
 	return applicationID, err
 }
@@ -162,7 +162,7 @@ func (tenantDataService TenantDataService) UpdateApplication(tenantID system.UUI
 		return fmt.Errorf("Tenant Application not found. Tenant ID: %s, Application ID: %s", tenantID.String(), applicationID.String())
 	}
 
-	return addNewApplication(tenantID, applicationID, application, session)
+	return addOrUpdateApplication(tenantID, applicationID, application, session)
 }
 
 // ReadApplication retrieves an existing tenant information.
@@ -226,8 +226,8 @@ func mapSystemUUIDToGocqlUUID(uuid system.UUID) gocql.UUID {
 	return mappedUUID
 }
 
-// addNewTenant adds new tenant to tenant table
-func addNewTenant(tenantID system.UUID, tenant contract.Tenant, session *gocql.Session) error {
+// addOrUpdateTenant adds new tenant to tenant table
+func addOrUpdateTenant(tenantID system.UUID, tenant contract.Tenant, session *gocql.Session) error {
 	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
 
 	return session.Query(
@@ -272,8 +272,8 @@ func doesTenantExist(tenantID system.UUID, session *gocql.Session) bool {
 	return iter.Scan(&secretKey)
 }
 
-// addNewApplication adds new qpplication to tenant application table
-func addNewApplication(tenantID, applicationID system.UUID, application contract.Application, session *gocql.Session) error {
+// addOrUpdateApplication adds new qpplication to tenant application table
+func addOrUpdateApplication(tenantID, applicationID system.UUID, application contract.Application, session *gocql.Session) error {
 	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
 	mappedApplicationID := mapSystemUUIDToGocqlUUID(applicationID)
 

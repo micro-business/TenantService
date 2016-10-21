@@ -5,3 +5,8 @@ package domain
 type Tenant struct {
 	SecretKey string
 }
+
+// Application defines how a application should look like
+type Application struct {
+	Name string
+}

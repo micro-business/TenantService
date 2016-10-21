@@ -62,6 +62,64 @@ func (tenantService TenantService) DeleteTenant(tenantID system.UUID) error {
 	return tenantService.TenantDataService.DeleteTenant(tenantID)
 }
 
+// CreateApplication creates new application for the provided tenant.
+// tenantID: Mandatory. The unique identifier of the tenant to create the application for.
+// application: Mandatory. The reference to the new application to create for the provided tenant
+// Returns either the unique identifier of the new application or error if something goes wrong.
+func (tenantService TenantService) CreateApplication(tenantID system.UUID, application domain.Application) (system.UUID, error) {
+	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+
+	validateApplication(application)
+
+	return tenantService.TenantDataService.CreateApplication(tenantID, mapToDataApplication(application))
+}
+
+// Update updates an existing tenant application.
+// tenantID: Mandatory: The unique identifier of the existing tenant.
+// applicationID: Mandatory: The unique identifier of the existing application.
+// application: Mandatory. The reference to the updated application information.
+// Returns error if something goes wrong.
+func (tenantService TenantService) UpdateApplication(tenantID system.UUID, applicationID system.UUID, application domain.Application) error {
+	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
+
+	validateApplication(application)
+
+	return tenantService.TenantDataService.UpdateApplication(tenantID, applicationID, mapToDataApplication(application))
+}
+
+// Read retrieves an existing tenant information.
+// tenantID: Mandatory: The unique identifier of the existing tenant.
+// applicationID: Mandatory: The unique identifier of the existing application.
+// Returns either the tenant application information or error if something goes wrong.
+func (tenantService TenantService) ReadApplication(tenantID system.UUID, applicationID system.UUID) (domain.Application, error) {
+	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
+
+	application, err := tenantService.TenantDataService.ReadApplication(tenantID, applicationID)
+
+	if err != nil {
+		return domain.Application{}, err
+	}
+
+	return mapFromDataApplication(application), nil
+}
+
+// Delete deletes an existing tenant application information.
+// tenantID: Mandatory: The unique identifier of the existing tenant to remove.
+// applicationID: Mandatory: The unique identifier of the existing application.
+// Returns error if something goes wrong.
+func (tenantService TenantService) DeleteApplication(tenantID system.UUID, applicationID system.UUID) error {
+	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+	diagnostics.IsNotNilOrEmpty(applicationID, "applicationID", "applicationID must be provided.")
+
+	return tenantService.TenantDataService.DeleteApplication(tenantID, applicationID)
+}
+
 // validateTenant validates the tenant domain object and make sure the data is consistent and valid.
 func validateTenant(tenant domain.Tenant) {
 	diagnostics.IsNotNilOrEmptyOrWhitespace(tenant.SecretKey, "tenant.SecretKey", "SecretKey must be provided.")
@@ -79,4 +137,23 @@ func mapToDataTenant(tenant domain.Tenant) contract.Tenant {
 // Returns the converted tenant domain object
 func mapFromDataTenant(tenant contract.Tenant) domain.Tenant {
 	return domain.Tenant{SecretKey: tenant.SecretKey}
+}
+
+// validateApplication validates the tenant application domain object and make sure the data is consistent and valid.
+func validateApplication(application domain.Application) {
+	diagnostics.IsNotNilOrEmptyOrWhitespace(application.Name, "application.Name", "Name must be provided.")
+}
+
+// mapToDataApplication Maps the domain tenant application object to the tenant application object used in data layer.
+// application: Mandatory. The tenant application domain object
+// Returns the converted tenant application object used in data layer
+func mapToDataApplication(application domain.Application) contract.Application {
+	return contract.Application{Name: application.Name}
+}
+
+// mapFromDataApplication Maps the tenant application object used in data layer to the tenant application domain object.
+// application: Mandatory. The tenant application object used in data layer
+// Returns the converted tenant application domain object
+func mapFromDataApplication(application contract.Application) domain.Application {
+	return domain.Application{Name: application.Name}
 }
