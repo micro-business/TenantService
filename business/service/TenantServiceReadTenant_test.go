@@ -6,12 +6,14 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/microbusinesses/TenantService/business/domain"
 	"github.com/microbusinesses/TenantService/business/service"
+	"github.com/microbusinesses/TenantService/data/contract"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DeleteTenant method input parameters and dependency test", func() {
+var _ = Describe("ReadTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -36,18 +38,18 @@ var _ = Describe("DeleteTenant method input parameters and dependency test", fun
 		It("should panic", func() {
 			tenantService.TenantDataService = nil
 
-			Ω(func() { tenantService.Delete(tenantID) }).Should(Panic())
+			Ω(func() { tenantService.ReadTenant(tenantID) }).Should(Panic())
 		})
 	})
 
 	Describe("Input Parameters", func() {
 		It("should panic when empty tenant unique identifier provided", func() {
-			Ω(func() { tenantService.Delete(system.EmptyUUID) }).Should(Panic())
+			Ω(func() { tenantService.ReadTenant(system.EmptyUUID) }).Should(Panic())
 		})
 	})
 })
 
-var _ = Describe("DeleteTenant method behaviour", func() {
+var _ = Describe("ReadTenant method behaviour", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -68,43 +70,48 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should call tenant data service DeleteTenant function", func() {
-		mockTenantDataService.EXPECT().DeleteTenant(tenantID)
+	It("should call tenant data service ReadTenant function", func() {
+		mockTenantDataService.EXPECT().ReadTenant(tenantID)
 
-		tenantService.Delete(tenantID)
+		tenantService.ReadTenant(tenantID)
 	})
 
-	Context("when tenant data service succeeds to delete the existing tenant", func() {
+	Context("when tenant data service succeeds to read the requested tenant", func() {
 		It("should return no error", func() {
+			randomValue, _ := system.RandomUUID()
+			expectedTenant := domain.Tenant{SecretKey: randomValue.String()}
+
 			mockTenantDataService.
 				EXPECT().
-				DeleteTenant(tenantID).
-				Return(nil)
+				ReadTenant(tenantID).
+				Return(contract.Tenant{SecretKey: expectedTenant.SecretKey}, nil)
 
-			err := tenantService.Delete(tenantID)
+			tenant, err := tenantService.ReadTenant(tenantID)
 
+			Expect(tenant).To(Equal(expectedTenant))
 			Expect(err).To(BeNil())
 		})
 	})
 
-	Context("when tenant data service fails to delete the existing tenant", func() {
-		It("should return error returned by tenant data service", func() {
+	Context("when tenant data service fails to read the requested tenant", func() {
+		It("should return the error returned by tenant data service", func() {
 			expectedErrorID, _ := system.RandomUUID()
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				DeleteTenant(tenantID).
-				Return(expectedError)
+				ReadTenant(tenantID).
+				Return(contract.Tenant{}, expectedError)
 
-			err := tenantService.Delete(tenantID)
+			expectedTenant, err := tenantService.ReadTenant(tenantID)
 
+			Expect(expectedTenant).To(Equal(domain.Tenant{}))
 			Expect(err).To(Equal(expectedError))
 		})
 	})
 })
 
-func TestDeleteTenant(t *testing.T) {
+func TestReadTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "DeleteTenant method input parameters and dependency test")
-	RunSpecs(t, "DeleteTenant method behaviour")
+	RunSpecs(t, "ReadTenant method input parameters and dependency test")
+	RunSpecs(t, "ReadTenant method behaviour")
 }

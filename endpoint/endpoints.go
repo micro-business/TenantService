@@ -62,7 +62,7 @@ var rootQueryType = graphql.NewObject(
 
 					var returnedTenant domain.Tenant
 
-					if returnedTenant, err = executionContext.tenantService.Read(tenantID); err != nil {
+					if returnedTenant, err = executionContext.tenantService.ReadTenant(tenantID); err != nil {
 						return nil, err
 					}
 
@@ -77,7 +77,7 @@ var rootMutationType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "RootMutation",
 		Fields: graphql.Fields{
-			"create": &graphql.Field{
+			"createTenant": &graphql.Field{
 				Type:        graphql.ID,
 				Description: "Creates new tenant",
 				Args: graphql.FieldConfigArgument{
@@ -92,7 +92,7 @@ var rootMutationType = graphql.NewObject(
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
-					tenantID, err := executionContext.tenantService.Create(tenant)
+					tenantID, err := executionContext.tenantService.CreateTenant(tenant)
 
 					if err != nil {
 						return nil, err
@@ -102,9 +102,9 @@ var rootMutationType = graphql.NewObject(
 				},
 			},
 
-			"update": &graphql.Field{
+			"updateTenant": &graphql.Field{
 				Type:        graphql.ID,
-				Description: "Update existing tenant",
+				Description: "Updates existing tenant",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.ID),
@@ -128,7 +128,7 @@ var rootMutationType = graphql.NewObject(
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
-					err = executionContext.tenantService.Update(tenantID, tenant)
+					err = executionContext.tenantService.UpdateTenant(tenantID, tenant)
 
 					if err != nil {
 						return nil, err
@@ -138,9 +138,9 @@ var rootMutationType = graphql.NewObject(
 				},
 			},
 
-			"delete": &graphql.Field{
+			"deleteTenant": &graphql.Field{
 				Type:        graphql.ID,
-				Description: "Delete existing tenant",
+				Description: "Deletes existing tenant",
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.ID),
@@ -158,7 +158,7 @@ var rootMutationType = graphql.NewObject(
 
 					executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
-					err = executionContext.tenantService.Delete(tenantID)
+					err = executionContext.tenantService.DeleteTenant(tenantID)
 
 					if err != nil {
 						return nil, err

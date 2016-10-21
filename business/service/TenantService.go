@@ -12,10 +12,10 @@ type TenantService struct {
 	TenantDataService contract.TenantDataService
 }
 
-// Create creates a new tenant.
+// CreateTenant creates a new tenant.
 // tenant: Mandatory. The reference to the new tenant information
 // Returns either the unique identifier of the new tenant or error if something goes wrong.
-func (tenantService TenantService) Create(tenant domain.Tenant) (system.UUID, error) {
+func (tenantService TenantService) CreateTenant(tenant domain.Tenant) (system.UUID, error) {
 	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
 
 	validateTenant(tenant)
@@ -23,11 +23,11 @@ func (tenantService TenantService) Create(tenant domain.Tenant) (system.UUID, er
 	return tenantService.TenantDataService.CreateTenant(mapToDataTenant(tenant))
 }
 
-// Update updates an existing tenant.
+// UpdateTenant updates an existing tenant.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // tenant: Mandatory. The reference to the updated tenant information.
 // Returns error if something goes wrong.
-func (tenantService TenantService) Update(tenantID system.UUID, tenant domain.Tenant) error {
+func (tenantService TenantService) UpdateTenant(tenantID system.UUID, tenant domain.Tenant) error {
 	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
@@ -36,10 +36,10 @@ func (tenantService TenantService) Update(tenantID system.UUID, tenant domain.Te
 	return tenantService.TenantDataService.UpdateTenant(tenantID, mapToDataTenant(tenant))
 }
 
-// Read retrieves an existing tenant.
+// ReadTenant retrieves an existing tenant.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // Returns either the tenant information or error if something goes wrong.
-func (tenantService TenantService) Read(tenantID system.UUID) (domain.Tenant, error) {
+func (tenantService TenantService) ReadTenant(tenantID system.UUID) (domain.Tenant, error) {
 	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 
@@ -52,10 +52,10 @@ func (tenantService TenantService) Read(tenantID system.UUID) (domain.Tenant, er
 	return mapFromDataTenant(tenant), nil
 }
 
-// Delete deletes an existing tenant information.
+// DeleteTenant deletes an existing tenant information.
 // tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 // Returns error if something goes wrong.
-func (tenantService TenantService) Delete(tenantID system.UUID) error {
+func (tenantService TenantService) DeleteTenant(tenantID system.UUID) error {
 	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
 	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
 

@@ -13,11 +13,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("CreateTenant method input parameters and dependency test", func() {
+var _ = Describe("UpdateTenant method input parameters and dependency test", func() {
 	var (
 		mockCtrl                          *gomock.Controller
 		tenantService                     *service.TenantService
 		mockTenantDataService             *MockTenantDataService
+		tenantID                          system.UUID
 		validTenant                       domain.Tenant
 		tenantWithEmptySecretKey          domain.Tenant
 		tenantWithWhitespaceOnlySecretKey domain.Tenant
@@ -29,6 +30,7 @@ var _ = Describe("CreateTenant method input parameters and dependency test", fun
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
+		tenantID, _ = system.RandomUUID()
 		validTenant = domain.Tenant{SecretKey: "Secret Key"}
 		tenantWithEmptySecretKey = domain.Tenant{SecretKey: ""}
 		tenantWithWhitespaceOnlySecretKey = domain.Tenant{SecretKey: "   "}
@@ -42,26 +44,31 @@ var _ = Describe("CreateTenant method input parameters and dependency test", fun
 		It("should panic", func() {
 			tenantService.TenantDataService = nil
 
-			Ω(func() { tenantService.Create(validTenant) }).Should(Panic())
+			Ω(func() { tenantService.UpdateTenant(tenantID, validTenant) }).Should(Panic())
 		})
 	})
 
 	Describe("Input Parameters", func() {
+		It("should panic when empty tenant unique identifier provided", func() {
+			Ω(func() { tenantService.UpdateTenant(system.EmptyUUID, validTenant) }).Should(Panic())
+		})
+
 		It("should panic when tenant with empty secret key provided", func() {
-			Ω(func() { tenantService.Create(tenantWithEmptySecretKey) }).Should(Panic())
+			Ω(func() { tenantService.UpdateTenant(tenantID, tenantWithEmptySecretKey) }).Should(Panic())
 		})
 
 		It("should panic when tenant with secret key contains whitespace characters only provided", func() {
-			Ω(func() { tenantService.Create(tenantWithWhitespaceOnlySecretKey) }).Should(Panic())
+			Ω(func() { tenantService.UpdateTenant(tenantID, tenantWithWhitespaceOnlySecretKey) }).Should(Panic())
 		})
 	})
 })
 
-var _ = Describe("CreateTenant method behaviour", func() {
+var _ = Describe("UpdateTenant method behaviour", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
 		mockTenantDataService *MockTenantDataService
+		tenantID              system.UUID
 		validTenant           domain.Tenant
 	)
 
@@ -71,6 +78,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 
 		tenantService = &service.TenantService{TenantDataService: mockTenantDataService}
 
+		tenantID, _ = system.RandomUUID()
 		validTenant = domain.Tenant{SecretKey: "Secret Key"}
 	})
 
@@ -78,53 +86,49 @@ var _ = Describe("CreateTenant method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should call tenant data service CreateTenant function", func() {
+	It("should call tenant data service UpdateTenant function", func() {
 		mappedTenant := contract.Tenant{SecretKey: validTenant.SecretKey}
 
-		mockTenantDataService.EXPECT().CreateTenant(mappedTenant)
+		mockTenantDataService.EXPECT().UpdateTenant(tenantID, mappedTenant)
 
-		tenantService.Create(validTenant)
+		tenantService.UpdateTenant(tenantID, validTenant)
 	})
 
-	Context("when tenant data service succeeds to create the new tenant", func() {
-		It("should return the returned tenant unique identifier by tenant data service and no error", func() {
-			key, _ := system.RandomUUID()
-			mappedTenant := contract.Tenant{SecretKey: key.String()}
+	Context("when tenant data service succeeds to update the existing tenant", func() {
+		It("should return no error", func() {
+			mappedTenant := contract.Tenant{SecretKey: validTenant.SecretKey}
 
-			expectedTenantID, _ := system.RandomUUID()
 			mockTenantDataService.
 				EXPECT().
-				CreateTenant(mappedTenant).
-				Return(expectedTenantID, nil)
+				UpdateTenant(tenantID, mappedTenant).
+				Return(nil)
 
-			newTenantID, err := tenantService.Create(domain.Tenant{SecretKey: key.String()})
+			err := tenantService.UpdateTenant(tenantID, validTenant)
 
-			Expect(expectedTenantID).To(Equal(newTenantID))
 			Expect(err).To(BeNil())
 		})
 	})
 
-	Context("when tenant data service fails to create the new tenant", func() {
-		It("should return tenant unique identifier as empty UUID and the returned error by tenant data service", func() {
+	Context("when tenant data service fails to update the existing tenant", func() {
+		It("should return error returned by tenant data service", func() {
 			mappedTenant := contract.Tenant{SecretKey: validTenant.SecretKey}
 
 			expectedErrorID, _ := system.RandomUUID()
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				CreateTenant(mappedTenant).
-				Return(system.EmptyUUID, expectedError)
+				UpdateTenant(tenantID, mappedTenant).
+				Return(expectedError)
 
-			newTenantID, err := tenantService.Create(validTenant)
+			err := tenantService.UpdateTenant(tenantID, validTenant)
 
-			Expect(newTenantID).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(expectedError))
 		})
 	})
 })
 
-func TestCreateTenant(t *testing.T) {
+func TestUpdateTenant(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "CreateTenant method input parameters and dependency test")
-	RunSpecs(t, "CreateTenant method behaviour")
+	RunSpecs(t, "UpdateTenant method input parameters and dependency test")
+	RunSpecs(t, "UpdateTenant method behaviour")
 }
