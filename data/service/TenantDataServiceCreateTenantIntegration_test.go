@@ -70,7 +70,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 
 			newTenantID, err := tenantDataService.CreateTenant(validTenant)
 
-			Expect(newTenantID).To(Equal(system.UUID))
+			Expect(newTenantID).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(expectedError))
 		})
 	})
