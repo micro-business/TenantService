@@ -90,8 +90,8 @@ var _ = Describe("CreateApplication method behaviour", func() {
 		tenantService.CreateApplication(validTenantID, validApplication)
 	})
 
-	Context("when tenant data service succeeds to create the new tenant", func() {
-		It("should return the returned tenant unique identifier by tenant data service and no error", func() {
+	Context("when tenant data service succeeds to create the new application", func() {
+		It("should return the returned application unique identifier by tenant data service and no error", func() {
 			key, _ := system.RandomUUID()
 			mappedApplication := contract.Application{Name: key.String()}
 
@@ -108,8 +108,8 @@ var _ = Describe("CreateApplication method behaviour", func() {
 		})
 	})
 
-	Context("when tenant data service fails to create the new tenant", func() {
-		It("should return tenant unique identifier as empty UUID and the returned error by tenant data service", func() {
+	Context("when tenant data service fails to create the new application", func() {
+		It("should return application unique identifier as empty UUID and the returned error by tenant data service", func() {
 			mappedApplication := contract.Application{Name: validApplication.Name}
 
 			expectedErrorID, _ := system.RandomUUID()

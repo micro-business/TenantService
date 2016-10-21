@@ -104,7 +104,7 @@ var _ = Describe("UpdateApplication method behaviour", func() {
 		tenantService.UpdateApplication(validTenantID, validApplicationID, validApplication)
 	})
 
-	Context("when tenant data service succeeds to update the existing tenant", func() {
+	Context("when tenant data service succeeds to update the existing application", func() {
 		It("should return no error", func() {
 			mappedApplication := contract.Application{Name: validApplication.Name}
 
@@ -119,7 +119,7 @@ var _ = Describe("UpdateApplication method behaviour", func() {
 		})
 	})
 
-	Context("when tenant data service fails to update the existing tenant", func() {
+	Context("when tenant data service fails to update the existing application", func() {
 		It("should return error returned by tenant data service", func() {
 			mappedApplication := contract.Application{Name: validApplication.Name}
 

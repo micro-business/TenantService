@@ -6,12 +6,14 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/microbusinesses/TenantService/business/domain"
 	"github.com/microbusinesses/TenantService/business/service"
+	"github.com/microbusinesses/TenantService/data/contract"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DeleteApplication method input parameters and dependency test", func() {
+var _ = Describe("ReadApplication method input parameters and dependency test", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -38,22 +40,22 @@ var _ = Describe("DeleteApplication method input parameters and dependency test"
 		It("should panic", func() {
 			tenantService.TenantDataService = nil
 
-			Ω(func() { tenantService.DeleteApplication(validTenantID, validApplicationID) }).Should(Panic())
+			Ω(func() { tenantService.ReadApplication(validTenantID, validApplicationID) }).Should(Panic())
 		})
 	})
 
 	Describe("Input Parameters", func() {
 		It("should panic when empty tenant unique identifier provided", func() {
-			Ω(func() { tenantService.DeleteApplication(system.EmptyUUID, validApplicationID) }).Should(Panic())
+			Ω(func() { tenantService.ReadApplication(system.EmptyUUID, validApplicationID) }).Should(Panic())
 		})
 
 		It("should panic when empty application unique identifier provided", func() {
-			Ω(func() { tenantService.DeleteApplication(validTenantID, system.EmptyUUID) }).Should(Panic())
+			Ω(func() { tenantService.ReadApplication(validTenantID, system.EmptyUUID) }).Should(Panic())
 		})
 	})
 })
 
-var _ = Describe("DeleteApplication method behaviour", func() {
+var _ = Describe("ReadApplication method behaviour", func() {
 	var (
 		mockCtrl              *gomock.Controller
 		tenantService         *service.TenantService
@@ -76,43 +78,48 @@ var _ = Describe("DeleteApplication method behaviour", func() {
 		mockCtrl.Finish()
 	})
 
-	It("should call tenant data service DeleteApplication function", func() {
-		mockTenantDataService.EXPECT().DeleteApplication(validTenantID, validApplicationID)
+	It("should call tenant data service ReadApplication function", func() {
+		mockTenantDataService.EXPECT().ReadApplication(validTenantID, validApplicationID)
 
-		tenantService.DeleteApplication(validTenantID, validApplicationID)
+		tenantService.ReadApplication(validTenantID, validApplicationID)
 	})
 
-	Context("when tenant data service succeeds to delete the existing application", func() {
+	Context("when tenant data service succeeds to read the requested application", func() {
 		It("should return no error", func() {
+			randomValue, _ := system.RandomUUID()
+			expectedApplication := domain.Application{Name: randomValue.String()}
+
 			mockTenantDataService.
 				EXPECT().
-				DeleteApplication(validTenantID, validApplicationID).
-				Return(nil)
+				ReadApplication(validTenantID, validApplicationID).
+				Return(contract.Application{Name: expectedApplication.Name}, nil)
 
-			err := tenantService.DeleteApplication(validTenantID, validApplicationID)
+			application, err := tenantService.ReadApplication(validTenantID, validApplicationID)
 
+			Expect(application).To(Equal(expectedApplication))
 			Expect(err).To(BeNil())
 		})
 	})
 
-	Context("when tenant data service fails to delete the existing application", func() {
-		It("should return error returned by tenant data service", func() {
+	Context("when tenant data service fails to read the requested application", func() {
+		It("should return the error returned by tenant data service", func() {
 			expectedErrorID, _ := system.RandomUUID()
 			expectedError := errors.New(expectedErrorID.String())
 			mockTenantDataService.
 				EXPECT().
-				DeleteApplication(validTenantID, validApplicationID).
-				Return(expectedError)
+				ReadApplication(validTenantID, validApplicationID).
+				Return(contract.Application{}, expectedError)
 
-			err := tenantService.DeleteApplication(validTenantID, validApplicationID)
+			expectedApplication, err := tenantService.ReadApplication(validTenantID, validApplicationID)
 
+			Expect(expectedApplication).To(Equal(domain.Application{}))
 			Expect(err).To(Equal(expectedError))
 		})
 	})
 })
 
-func TestDeleteApplication(t *testing.T) {
+func TestReadApplication(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "DeleteApplication method input parameters and dependency test")
-	RunSpecs(t, "DeleteApplication method behaviour")
+	RunSpecs(t, "ReadApplication method input parameters and dependency test")
+	RunSpecs(t, "ReadApplication method behaviour")
 }
