@@ -56,8 +56,8 @@ func (tenantDataService TenantDataService) Update(tenantID system.UUID, tenant c
 
 	defer session.Close()
 
-	if _, err := readTenant(tenantID, session); err != nil {
-		return err
+	if !doesTenantExist(tenantID, session) {
+		return fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
 	}
 
 	return addNewTenant(tenantID, tenant, session)
@@ -95,8 +95,8 @@ func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
 
 	defer session.Close()
 
-	if _, err := readTenant(tenantID, session); err != nil {
-		return err
+	if !doesTenantExist(tenantID, session) {
+		return fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
 	}
 
 	mappedTenantID := mapSystemUUIDToGocqlUUID(tenantID)
@@ -107,6 +107,39 @@ func (tenantDataService TenantDataService) Delete(tenantID system.UUID) error {
 			" tenant_id = ?",
 		mappedTenantID).
 		Exec()
+}
+
+// CreateApplication creates new application for the provided tenant.
+// tenantID: Mandatory. The unique identifier of the tenant to create the application for.
+// application: Mandatory. The reference to the new application to create for the provided tenant
+// Returns either the unique identifier of the new application or error if something goes wrong.
+func (tenantDataService TenantDataService) CreateApplication(tenantID system.UUID, application contract.Application) (system.UUID, error) {
+	panic("Not implemented")
+}
+
+// Update updates an existing tenant application.
+// tenantID: Mandatory: The unique identifier of the existing tenant.
+// applicationID: Mandatory: The unique identifier of the existing application.
+// application: Mandatory. The reference to the updated application information.
+// Returns error if something goes wrong.
+func (tenantDataService TenantDataService) UpdateApplication(tenantID system.UUID, applicationID system.UUID, application contract.Application) error {
+	panic("Not implemented")
+}
+
+// Read retrieves an existing tenant information.
+// tenantID: Mandatory: The unique identifier of the existing tenant.
+// applicationID: Mandatory: The unique identifier of the existing application.
+// Returns either the tenant application information or error if something goes wrong.
+func (tenantDataService TenantDataService) ReadApplication(tenantID system.UUID, applicationID system.UUID) (contract.Application, error) {
+	panic("Not implemented")
+}
+
+// Delete deletes an existing tenant application information.
+// tenantID: Mandatory: The unique identifier of the existing tenant to remove.
+// applicationID: Mandatory: The unique identifier of the existing application.
+// Returns error if something goes wrong.
+func (tenantDataService TenantDataService) DeleteApplication(tenantID system.UUID, applicationID system.UUID) error {
+	panic("Not implemented")
 }
 
 // mapSystemUUIDToGocqlUUID maps the system type UUID to gocql UUID type
@@ -146,4 +179,34 @@ func readTenant(tenantID system.UUID, session *gocql.Session) (contract.Tenant, 
 
 	return tenant, nil
 
+}
+
+// doesTenantExist checks whether the provided tenant exists in database
+func doesTenantExist(tenantID system.UUID, session *gocql.Session) bool {
+	iter := session.Query(
+		"SELECT secret_key"+
+			" FROM tenant"+
+			" WHERE"+
+			" tenant_id = ?",
+		tenantID.String()).Iter()
+
+	var secretKey string
+
+	return iter.Scan(&secretKey)
+}
+
+// doesTenantExist checks whether the provided tenant exists in database
+func doesApplicationExist(tenantID system.UUID, applicationID system.UUID, session *gocql.Session) bool {
+	iter := session.Query(
+		"SELECT name"+
+			" FROM application"+
+			" WHERE"+
+			" tenant_id = ?"+
+			" AND application_id = ?",
+		tenantID.String(),
+		applicationID.String()).Iter()
+
+	var name string
+
+	return iter.Scan(&name)
 }
