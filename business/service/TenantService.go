@@ -75,7 +75,7 @@ func (tenantService TenantService) CreateApplication(tenantID system.UUID, appli
 	return tenantService.TenantDataService.CreateApplication(tenantID, mapToDataApplication(application))
 }
 
-// Update updates an existing tenant application.
+// UpdateApplication updates an existing tenant application.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // applicationID: Mandatory: The unique identifier of the existing application.
 // application: Mandatory. The reference to the updated application information.
@@ -90,7 +90,7 @@ func (tenantService TenantService) UpdateApplication(tenantID system.UUID, appli
 	return tenantService.TenantDataService.UpdateApplication(tenantID, applicationID, mapToDataApplication(application))
 }
 
-// Read retrieves an existing tenant information.
+// ReadApplication retrieves an existing tenant information.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // applicationID: Mandatory: The unique identifier of the existing application.
 // Returns either the tenant application information or error if something goes wrong.
@@ -108,7 +108,7 @@ func (tenantService TenantService) ReadApplication(tenantID system.UUID, applica
 	return mapFromDataApplication(application), nil
 }
 
-// Delete deletes an existing tenant application information.
+// DeleteApplication deletes an existing tenant application information.
 // tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 // applicationID: Mandatory: The unique identifier of the existing application.
 // Returns error if something goes wrong.
