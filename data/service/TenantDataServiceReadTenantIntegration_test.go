@@ -61,7 +61,7 @@ var _ = Describe("ReadTenant method behaviour", func() {
 		returnedTenant, err := tenantDataService.ReadTenant(returnedTenantID)
 
 		Expect(err).To(BeNil())
-		Expect(expectedTenant).To(Equal(returnedTenant))
+		Expect(returnedTenant).To(Equal(expectedTenant))
 	})
 })
 

@@ -58,7 +58,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 
 			newApplicationID, err := tenantDataService.CreateApplication(tenantID, validApplication)
 
-			Expect(expectedApplicationID).To(Equal(newApplicationID))
+			Expect(newApplicationID).To(Equal(expectedApplicationID))
 			Expect(err).To(BeNil())
 		})
 	})
@@ -92,7 +92,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 			invalidTenantID, _ := system.RandomUUID()
 			newApplicationID, err := tenantDataService.CreateApplication(invalidTenantID, validApplication)
 
-			Expect(system.EmptyUUID).To(Equal(newApplicationID))
+			Expect(newApplicationID).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", invalidTenantID.String())))
 		})
 
@@ -107,7 +107,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 
 			newApplicationID, err := tenantDataService.CreateApplication(tenantID, validApplication)
 
-			Expect(validApplicationID).To(Equal(newApplicationID))
+			Expect(newApplicationID).To(Equal(validApplicationID))
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -133,7 +133,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 			var name string
 
 			Expect(iter.Scan(&name)).To(BeTrue())
-			Expect(validApplication.Name).To(Equal(name))
+			Expect(name).To(Equal(validApplication.Name))
 		})
 	})
 })

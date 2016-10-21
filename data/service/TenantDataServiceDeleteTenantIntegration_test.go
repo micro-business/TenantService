@@ -70,9 +70,9 @@ var _ = Describe("DeleteTenant method behaviour", func() {
 
 			session, err := config.CreateSession()
 
-			Expect(err).To(BeNil())
-
 			defer session.Close()
+
+			Expect(err).To(BeNil())
 
 			var secretKey string
 

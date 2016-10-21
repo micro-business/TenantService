@@ -73,9 +73,9 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 
 			session, err := config.CreateSession()
 
-			Expect(err).To(BeNil())
-
 			defer session.Close()
+
+			Expect(err).To(BeNil())
 
 			iter := session.Query(
 				"SELECT secret_key"+
@@ -89,7 +89,7 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 			var secretKey string
 
 			Expect(iter.Scan(&secretKey)).To(BeTrue())
-			Expect(updatedTenant.SecretKey).To(Equal(secretKey))
+			Expect(secretKey).To(Equal(updatedTenant.SecretKey))
 		})
 	})
 })

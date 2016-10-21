@@ -54,7 +54,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 
 			newTenantID, err := tenantDataService.CreateTenant(validTenant)
 
-			Expect(expectedTenantID).To(Equal(newTenantID))
+			Expect(newTenantID).To(Equal(expectedTenantID))
 			Expect(err).To(BeNil())
 		})
 	})
@@ -70,7 +70,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 
 			newTenantID, err := tenantDataService.CreateTenant(validTenant)
 
-			Expect(newTenantID).To(Equal(system.EmptyUUID))
+			Expect(newTenantID).To(Equal(system.UUID))
 			Expect(err).To(Equal(expectedError))
 		})
 	})
@@ -82,9 +82,9 @@ var _ = Describe("CreateTenant method behaviour", func() {
 				GenerateRandomUUID().
 				Return(validTenantID, nil)
 
-			returnedTenantID, err := tenantDataService.CreateTenant(validTenant)
+			newTenantID, err := tenantDataService.CreateTenant(validTenant)
 
-			Expect(validTenantID).To(Equal(returnedTenantID))
+			Expect(newTenantID).To(Equal(validTenantID))
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -92,9 +92,9 @@ var _ = Describe("CreateTenant method behaviour", func() {
 
 			session, err := config.CreateSession()
 
-			Expect(err).To(BeNil())
-
 			defer session.Close()
+
+			Expect(err).To(BeNil())
 
 			iter := session.Query(
 				"SELECT secret_key"+
@@ -108,7 +108,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 			var secretKey string
 
 			Expect(iter.Scan(&secretKey)).To(BeTrue())
-			Expect(validTenant.SecretKey).To(Equal(secretKey))
+			Expect(secretKey).To(Equal(validTenant.SecretKey))
 		})
 	})
 })

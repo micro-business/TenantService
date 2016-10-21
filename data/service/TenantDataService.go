@@ -279,7 +279,7 @@ func addOrUpdateApplication(tenantID, applicationID system.UUID, application con
 
 	return session.Query(
 		"INSERT INTO application"+
-			" (tenant_id, application_, name)"+
+			" (tenant_id, application_id, name)"+
 			" VALUES(?, ?, ?)",
 		mappedTenantID,
 		mappedApplicationID,
