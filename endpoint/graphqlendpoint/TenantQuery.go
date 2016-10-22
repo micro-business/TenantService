@@ -33,7 +33,7 @@ func getTenantQuery() *graphql.Field {
 				return nil, err
 			}
 
-			return tenant{SecretKey: returnedTenant.SecretKey}, nil
+			return tenant{ID: tenantID.String(), SecretKey: returnedTenant.SecretKey}, nil
 		},
 	}
 }

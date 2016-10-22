@@ -6,10 +6,12 @@ import (
 )
 
 const (
+	tenantID  = "ID"
 	secretKey = "SecretKey"
 )
 
 type tenant struct {
+	ID        string `json:"ID"`
 	SecretKey string `json:"SecretKey"`
 }
 
@@ -17,6 +19,7 @@ var tenantType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Tenant",
 		Fields: graphql.Fields{
+			tenantID:  &graphql.Field{Type: graphql.String},
 			secretKey: &graphql.Field{Type: graphql.String},
 		},
 	},

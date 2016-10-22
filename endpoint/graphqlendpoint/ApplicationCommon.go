@@ -6,10 +6,12 @@ import (
 )
 
 const (
-	name = "name"
+	applicationID = "ID"
+	name          = "Name"
 )
 
 type application struct {
+	ID   string `json:"ID"`
 	Name string `json:"Name"`
 }
 
@@ -17,7 +19,8 @@ var applicationType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Application",
 		Fields: graphql.Fields{
-			name: &graphql.Field{Type: graphql.String},
+			applicationID: &graphql.Field{Type: graphql.String},
+			name:          &graphql.Field{Type: graphql.String},
 		},
 	},
 )

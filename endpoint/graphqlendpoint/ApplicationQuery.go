@@ -43,7 +43,7 @@ func getApplicationQuery() *graphql.Field {
 				return nil, err
 			}
 
-			return application{Name: returnedApplication.Name}, nil
+			return application{ID: applicationID.String(), Name: returnedApplication.Name}, nil
 		},
 	}
 }
