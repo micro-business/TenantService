@@ -40,7 +40,6 @@ var _ = Describe("UpdateApplication method behaviour", func() {
 			Expect(err).To(BeNil())
 
 			invalidApplicationID, _ := system.RandomUUID()
-
 			Expect(tenantDataService.UpdateApplication(tenantID, invalidApplicationID, createApplicationInfo())).To(Equal(fmt.Errorf("Tenant Application not found. Tenant ID: %s, Application ID: %s", tenantID.String(), invalidApplicationID.String())))
 		})
 
