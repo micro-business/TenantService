@@ -14,6 +14,7 @@ func getCreateTenantQuery() *graphql.Field {
 				Type: graphql.NewNonNull(inputTenantType),
 			},
 		},
+
 		Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
 			inputTenantArgument, _ := resolveParams.Args["tenant"].(map[string]interface{})
 
@@ -34,25 +35,26 @@ func getCreateTenantQuery() *graphql.Field {
 
 func getUpdateTenantQuery() *graphql.Field {
 	return &graphql.Field{
-		Type:        graphql.ID,
+		Type:        graphql.Boolean,
 		Description: "Updates existing tenant",
 		Args: graphql.FieldConfigArgument{
-			"id": &graphql.ArgumentConfig{
+			"tenantID": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.ID),
 			},
 			"tenant": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(inputTenantType),
 			},
 		},
+
 		Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
+			tenantIDArg, _ := resolveParams.Args["tenantID"].(string)
 			inputTenantArgument, _ := resolveParams.Args["tenant"].(map[string]interface{})
-			id, _ := resolveParams.Args["id"].(string)
 
 			var tenantID system.UUID
 			var err error
 
-			if tenantID, err = system.ParseUUID(id); err != nil {
-				return nil, err
+			if tenantID, err = system.ParseUUID(tenantIDArg); err != nil {
+				return false, err
 			}
 
 			tenant := resolveTenantFromInputTenantArgument(inputTenantArgument)
@@ -62,31 +64,32 @@ func getUpdateTenantQuery() *graphql.Field {
 			err = executionContext.tenantService.UpdateTenant(tenantID, tenant)
 
 			if err != nil {
-				return nil, err
+				return false, err
 			}
 
-			return tenantID.String(), nil
+			return true, nil
 		},
 	}
 }
 
 func getDeleteTenantQuery() *graphql.Field {
 	return &graphql.Field{
-		Type:        graphql.ID,
+		Type:        graphql.Boolean,
 		Description: "Deletes existing tenant",
 		Args: graphql.FieldConfigArgument{
-			"id": &graphql.ArgumentConfig{
+			"tenantID": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.ID),
 			},
 		},
+
 		Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
-			id, _ := resolveParams.Args["id"].(string)
+			tenantIDArg, _ := resolveParams.Args["tenantID"].(string)
 
 			var tenantID system.UUID
 			var err error
 
-			if tenantID, err = system.ParseUUID(id); err != nil {
-				return nil, err
+			if tenantID, err = system.ParseUUID(tenantIDArg); err != nil {
+				return false, err
 			}
 
 			executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
@@ -94,11 +97,10 @@ func getDeleteTenantQuery() *graphql.Field {
 			err = executionContext.tenantService.DeleteTenant(tenantID)
 
 			if err != nil {
-				return nil, err
+				return false, err
 			}
 
-			return tenantID.String(), nil
-
+			return true, nil
 		},
 	}
 }

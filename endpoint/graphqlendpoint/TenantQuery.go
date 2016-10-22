@@ -11,19 +11,21 @@ func getTenantQuery() *graphql.Field {
 		Type:        tenantType,
 		Description: "Returns an existing tenant",
 		Args: graphql.FieldConfigArgument{
-			"id": &graphql.ArgumentConfig{
+			"tenantID": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
 		},
-		Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
-			executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
-			id, _ := resolveParams.Args["id"].(string)
 
-			tenantID, err := system.ParseUUID(id)
+		Resolve: func(resolveParams graphql.ResolveParams) (interface{}, error) {
+			tenantIDArg, _ := resolveParams.Args["tenantID"].(string)
+
+			tenantID, err := system.ParseUUID(tenantIDArg)
 
 			if err != nil {
 				return nil, err
 			}
+
+			executionContext := resolveParams.Context.Value("ExecutionContext").(executionContext)
 
 			var returnedTenant domain.Tenant
 
