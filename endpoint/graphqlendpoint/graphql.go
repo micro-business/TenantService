@@ -1,10 +1,9 @@
-package endpoint
+package graphqlendpoint
 
 import (
 	"errors"
 	"strings"
 
-	"github.com/go-kit/kit/endpoint"
 	"github.com/graphql-go/graphql"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	"github.com/microbusinesses/TenantService/business/contract"
@@ -178,31 +177,26 @@ type executionContext struct {
 	tenantService contract.TenantService
 }
 
-func createAPIEndpoint(tenantService contract.TenantService) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		result := executeQuery(request.(string), tenantService)
-
-		if result.HasErrors() {
-			errorMessages := []string{}
-
-			for _, err := range result.Errors {
-				errorMessages = append(errorMessages, err.Error())
-			}
-
-			return nil, errors.New(strings.Join(errorMessages, "\n"))
-		}
-
-		return result, nil
-	}
-}
-
-func executeQuery(query string, tenantService contract.TenantService) *graphql.Result {
-	return graphql.Do(
+// ExecuteQuery executes the provided query and returns the result.
+func ExecuteQuery(query string, tenantService contract.TenantService) (interface{}, error) {
+	result := graphql.Do(
 		graphql.Params{
 			Schema:        tenantSchema,
 			RequestString: query,
 			Context:       context.WithValue(context.Background(), "ExecutionContext", executionContext{tenantService}),
 		})
+
+	if result.HasErrors() {
+		errorMessages := []string{}
+
+		for _, err := range result.Errors {
+			errorMessages = append(errorMessages, err.Error())
+		}
+
+		return nil, errors.New(strings.Join(errorMessages, "\n"))
+	}
+
+	return result, nil
 }
 
 func resolveTenantFromInputTenantArgument(inputTenantArgument map[string]interface{}) domain.Tenant {
