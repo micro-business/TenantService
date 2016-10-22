@@ -188,17 +188,17 @@ func (tenantDataService TenantDataService) ReadApplication(tenantID system.UUID,
 // ReadAllApplications retrieves the list of created applications for the provided tenant.
 // tenantID: Mandatory: The unique identifier of the existing tenant.
 // Returns either the list of created applications for the provided tenant or error if something goes wrong.
-func (tenantDataService TenantDataService) ReadAllApplications(tenantID system.UUID) ([]contract.Application, error) {
+func (tenantDataService TenantDataService) ReadAllApplications(tenantID system.UUID) (map[system.UUID]contract.Application, error) {
 	session, err := tenantDataService.ClusterConfig.CreateSession()
 
 	if err != nil {
-		return []contract.Application{}, err
+		return nil, err
 	}
 
 	defer session.Close()
 
 	if !doesTenantExist(tenantID, session) {
-		return []contract.Application{}, fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
+		return nil, fmt.Errorf("Tenant not found. Tenant ID: %s", tenantID.String())
 	}
 
 	return readAllApplications(tenantID, session), nil
@@ -329,19 +329,20 @@ func readApplication(tenantID, applicationID system.UUID, session *gocql.Session
 }
 
 // readAllApplications takes the provided tenantID and read all the tenant applications information from database
-func readAllApplications(tenantID system.UUID, session *gocql.Session) []contract.Application {
+func readAllApplications(tenantID system.UUID, session *gocql.Session) map[system.UUID]contract.Application {
 	iter := session.Query(
-		"SELECT name"+
+		"SELECT application_id, name"+
 			" FROM application"+
 			" WHERE"+
 			" tenant_id = ?",
 		tenantID.String()).Iter()
 
+	var applicationID gocql.UUID
 	var name string
-	applications := make([]contract.Application, 0, 1)
+	applications := make(map[system.UUID]contract.Application)
 
-	for iter.Scan(&name) {
-		applications = append(applications, contract.Application{Name: name})
+	for iter.Scan(&applicationID, &name) {
+		applications[mapGocqlUUIDToSystemUUID(applicationID)] = contract.Application{Name: name}
 	}
 
 	return applications
@@ -361,4 +362,11 @@ func doesApplicationExist(tenantID system.UUID, applicationID system.UUID, sessi
 	var name string
 
 	return iter.Scan(&name)
+}
+
+// mapGocqlUUIDToSystemUUID maps the system type UUID to gocql UUID type
+func mapGocqlUUIDToSystemUUID(uuid gocql.UUID) system.UUID {
+	mappedUUID, _ := system.UUIDFromBytes(uuid.Bytes())
+
+	return mappedUUID
 }

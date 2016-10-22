@@ -79,9 +79,8 @@ var _ = Describe("ReadAllApplications method behaviour", func() {
 
 	Context("when tenant data service succeeds to read the requested applications for tenant without any application registered", func() {
 		It("should return no error and empty list of applications", func() {
-			applicationCount := 0
-			expectedDomainApplications := make([]domain.Application, 0, applicationCount)
-			expectedApplications := make([]contract.Application, 0, applicationCount)
+			expectedDomainApplications := make(map[system.UUID]domain.Application)
+			expectedApplications := make(map[system.UUID]contract.Application)
 
 			mockTenantDataService.
 				EXPECT().
@@ -97,15 +96,15 @@ var _ = Describe("ReadAllApplications method behaviour", func() {
 
 	Context("when tenant data service succeeds to read the requested applications", func() {
 		It("should return no error", func() {
-			applicationCount := rand.Intn(10) + 1
-			expectedDomainApplications := make([]domain.Application, 0, applicationCount)
-			expectedApplications := make([]contract.Application, 0, applicationCount)
+			expectedDomainApplications := make(map[system.UUID]domain.Application)
+			expectedApplications := make(map[system.UUID]contract.Application)
 
-			for idx := 0; idx < applicationCount; idx++ {
+			for idx := 0; idx < rand.Intn(10)+1; idx++ {
+				applicationID, _ := system.RandomUUID()
 				randomValue, _ := system.RandomUUID()
 
-				expectedDomainApplications = append(expectedDomainApplications, domain.Application{Name: randomValue.String()})
-				expectedApplications = append(expectedApplications, contract.Application{Name: randomValue.String()})
+				expectedDomainApplications[applicationID] = domain.Application{Name: randomValue.String()}
+				expectedApplications[applicationID] = contract.Application{Name: randomValue.String()}
 			}
 
 			mockTenantDataService.

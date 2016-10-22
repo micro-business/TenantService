@@ -104,9 +104,9 @@ func (_mr *_MockTenantDataServiceRecorder) ReadApplication(arg0, arg1 interface{
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "ReadApplication", arg0, arg1)
 }
 
-func (_m *MockTenantDataService) ReadAllApplications(tenantID system.UUID) ([]Application, error) {
+func (_m *MockTenantDataService) ReadAllApplications(tenantID system.UUID) (map[system.UUID]Application, error) {
 	ret := _m.ctrl.Call(_m, "ReadAllApplications", tenantID)
-	ret0, _ := ret[0].([]Application)
+	ret0, _ := ret[0].(map[system.UUID]Application)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

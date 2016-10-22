@@ -3,6 +3,7 @@
 package service_test
 
 import (
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -113,6 +114,29 @@ func createApplication(keyspace string) (system.UUID, contract.Tenant, system.UU
 	}
 
 	return tenantID, tenant, applicationID, application, nil
+}
+
+func createApplications(keyspace string) (system.UUID, contract.Tenant, map[system.UUID]contract.Application, error) {
+	tenantID, tenant, err := createTenant(keyspace)
+
+	if err != nil {
+		return system.EmptyUUID, contract.Tenant{}, nil, err
+	}
+
+	applications := make(map[system.UUID]contract.Application)
+
+	for idx := 0; idx < rand.Intn(5)+1; idx++ {
+		application := createApplicationInfo()
+		applicationID, err := createService().CreateApplication(tenantID, application)
+
+		if err != nil {
+			return system.EmptyUUID, contract.Tenant{}, nil, err
+		}
+
+		applications[applicationID] = application
+	}
+
+	return tenantID, tenant, applications, nil
 }
 
 func dropKeyspace(keyspace string) {
