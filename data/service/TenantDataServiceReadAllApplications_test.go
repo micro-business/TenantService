@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("ReadApplication method input parameters and dependency test", func() {
+var _ = Describe("ReadAllApplications method input parameters and dependency test", func() {
 	var (
 		tenantDataService *service.TenantDataService
 	)
@@ -24,14 +24,13 @@ var _ = Describe("ReadApplication method input parameters and dependency test", 
 			tenantDataService.ClusterConfig = nil
 
 			validTenantID, _ := system.RandomUUID()
-			validApplicationID, _ := system.RandomUUID()
 
-			Ω(func() { tenantDataService.ReadApplication(validTenantID, validApplicationID) }).Should(Panic())
+			Ω(func() { tenantDataService.ReadAllApplications(validTenantID) }).Should(Panic())
 		})
 	})
 })
 
-func TestReadApplication(t *testing.T) {
+func TestReadAllApplications(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "ReadApplication method input parameters and dependency test")
+	RunSpecs(t, "ReadAllApplications method input parameters and dependency test")
 }

@@ -108,6 +108,28 @@ func (tenantService TenantService) ReadApplication(tenantID system.UUID, applica
 	return mapFromDataApplication(application), nil
 }
 
+// ReadAllApplications retrieves the list of created applications for the provided tenant.
+// tenantID: Mandatory: The unique identifier of the existing tenant.
+// Returns either the list of created applications for the provided tenant or error if something goes wrong.
+func (tenantService TenantService) ReadAllApplications(tenantID system.UUID) ([]domain.Application, error) {
+	diagnostics.IsNotNil(tenantService.TenantDataService, "tenantService.TenantDataServic", "TenantDataService must be provided.")
+	diagnostics.IsNotNilOrEmpty(tenantID, "tenantID", "tenantID must be provided.")
+
+	returnedApplications, err := tenantService.TenantDataService.ReadAllApplications(tenantID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	applications := make([]domain.Application, 0, len(returnedApplications))
+
+	for _, application := range returnedApplications {
+		applications = append(applications, mapFromDataApplication(application))
+	}
+
+	return applications, nil
+}
+
 // DeleteApplication deletes an existing tenant application information.
 // tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 // applicationID: Mandatory: The unique identifier of the existing application.

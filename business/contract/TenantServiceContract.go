@@ -48,6 +48,11 @@ type TenantService interface {
 	// Returns either the tenant application information or error if something goes wrong.
 	ReadApplication(tenantID system.UUID, applicationID system.UUID) (domain.Application, error)
 
+	// ReadAllApplications retrieves the list of created applications for the provided tenant.
+	// tenantID: Mandatory: The unique identifier of the existing tenant.
+	// Returns either the list of created applications for the provided tenant or error if something goes wrong.
+	ReadAllApplications(tenantID system.UUID) ([]domain.Application, error)
+
 	// DeleteApplication deletes an existing tenant application information.
 	// tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 	// applicationID: Mandatory: The unique identifier of the existing application.

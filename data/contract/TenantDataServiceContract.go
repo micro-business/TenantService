@@ -42,20 +42,25 @@ type TenantDataService interface {
 	// Returns either the unique identifier of the new application or error if something goes wrong.
 	CreateApplication(tenantID system.UUID, application Application) (system.UUID, error)
 
-	// Update updates an existing tenant application.
+	// UpdateApplication updates an existing tenant application.
 	// tenantID: Mandatory: The unique identifier of the existing tenant.
 	// applicationID: Mandatory: The unique identifier of the existing application.
 	// application: Mandatory. The reference to the updated application information.
 	// Returns error if something goes wrong.
 	UpdateApplication(tenantID system.UUID, applicationID system.UUID, application Application) error
 
-	// Read retrieves an existing tenant information.
+	// ReadApplication retrieves an existing tenant information.
 	// tenantID: Mandatory: The unique identifier of the existing tenant.
 	// applicationID: Mandatory: The unique identifier of the existing application.
 	// Returns either the tenant application information or error if something goes wrong.
 	ReadApplication(tenantID system.UUID, applicationID system.UUID) (Application, error)
 
-	// Delete deletes an existing tenant application information.
+	// ReadAllApplications retrieves the list of created applications for the provided tenant.
+	// tenantID: Mandatory: The unique identifier of the existing tenant.
+	// Returns either the list of created applications for the provided tenant or error if something goes wrong.
+	ReadAllApplications(tenantID system.UUID) ([]Application, error)
+
+	// DeleteApplication deletes an existing tenant application information.
 	// tenantID: Mandatory: The unique identifier of the existing tenant to remove.
 	// applicationID: Mandatory: The unique identifier of the existing application.
 	// Returns error if something goes wrong.

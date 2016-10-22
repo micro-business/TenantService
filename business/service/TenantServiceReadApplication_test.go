@@ -110,9 +110,9 @@ var _ = Describe("ReadApplication method behaviour", func() {
 				ReadApplication(validTenantID, validApplicationID).
 				Return(contract.Application{}, expectedError)
 
-			expectedApplication, err := tenantService.ReadApplication(validTenantID, validApplicationID)
+			application, err := tenantService.ReadApplication(validTenantID, validApplicationID)
 
-			Expect(expectedApplication).To(Equal(domain.Application{}))
+			Expect(application).To(Equal(domain.Application{}))
 			Expect(err).To(Equal(expectedError))
 		})
 	})
