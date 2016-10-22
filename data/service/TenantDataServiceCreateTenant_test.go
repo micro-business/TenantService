@@ -5,8 +5,6 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/data/contract"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,16 +15,12 @@ var _ = Describe("CreateTenant method input parameters and dependency test", fun
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
 		mockUUIDGeneratorService *MockUUIDGeneratorService
-		validTenant              contract.Tenant
 	)
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: &gocql.ClusterConfig{}}
-
-		randomValue, _ := system.RandomUUID()
-		validTenant = contract.Tenant{SecretKey: randomValue.String()}
 	})
 
 	AfterEach(func() {
@@ -37,7 +31,7 @@ var _ = Describe("CreateTenant method input parameters and dependency test", fun
 		It("should panic", func() {
 			tenantDataService.UUIDGeneratorService = nil
 
-			Ω(func() { tenantDataService.CreateTenant(validTenant) }).Should(Panic())
+			Ω(func() { tenantDataService.CreateTenant(createTenantInfo()) }).Should(Panic())
 		})
 	})
 
@@ -45,7 +39,7 @@ var _ = Describe("CreateTenant method input parameters and dependency test", fun
 		It("should panic", func() {
 			tenantDataService.ClusterConfig = nil
 
-			Ω(func() { tenantDataService.CreateTenant(validTenant) }).Should(Panic())
+			Ω(func() { tenantDataService.CreateTenant(createTenantInfo()) }).Should(Panic())
 		})
 	})
 })

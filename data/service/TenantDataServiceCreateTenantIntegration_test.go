@@ -9,7 +9,6 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/data/contract"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -20,8 +19,6 @@ var _ = Describe("CreateTenant method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
 		mockUUIDGeneratorService *MockUUIDGeneratorService
-		validTenantID            system.UUID
-		validTenant              contract.Tenant
 		clusterConfig            *gocql.ClusterConfig
 	)
 
@@ -33,11 +30,6 @@ var _ = Describe("CreateTenant method behaviour", func() {
 		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
 
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
-
-		validTenantID, _ = system.RandomUUID()
-
-		randomValue, _ := system.RandomUUID()
-		validTenant = contract.Tenant{SecretKey: randomValue.String()}
 	})
 
 	AfterEach(func() {
@@ -52,7 +44,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 				GenerateRandomUUID().
 				Return(expectedTenantID, nil)
 
-			newTenantID, err := tenantDataService.CreateTenant(validTenant)
+			newTenantID, err := tenantDataService.CreateTenant(createTenantInfo())
 
 			Expect(newTenantID).To(Equal(expectedTenantID))
 			Expect(err).To(BeNil())
@@ -68,7 +60,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 				GenerateRandomUUID().
 				Return(system.EmptyUUID, expectedError)
 
-			newTenantID, err := tenantDataService.CreateTenant(validTenant)
+			newTenantID, err := tenantDataService.CreateTenant(createTenantInfo())
 
 			Expect(newTenantID).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(expectedError))
@@ -77,14 +69,16 @@ var _ = Describe("CreateTenant method behaviour", func() {
 
 	Context("when creating new tenant", func() {
 		It("should insert the record into tenant table", func() {
+			tenantID, _ := system.RandomUUID()
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(validTenantID, nil)
+				Return(tenantID, nil)
 
-			newTenantID, err := tenantDataService.CreateTenant(validTenant)
+			tenant := createTenantInfo()
+			newTenantID, err := tenantDataService.CreateTenant(tenant)
 
-			Expect(newTenantID).To(Equal(validTenantID))
+			Expect(newTenantID).To(Equal(tenantID))
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -101,14 +95,14 @@ var _ = Describe("CreateTenant method behaviour", func() {
 					" FROM tenant"+
 					" WHERE"+
 					" tenant_id = ?",
-				validTenantID.String()).Iter()
+				tenantID.String()).Iter()
 
 			defer iter.Close()
 
 			var secretKey string
 
 			Expect(iter.Scan(&secretKey)).To(BeTrue())
-			Expect(secretKey).To(Equal(validTenant.SecretKey))
+			Expect(secretKey).To(Equal(tenant.SecretKey))
 		})
 	})
 })

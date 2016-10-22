@@ -6,7 +6,6 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/data/contract"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -18,7 +17,6 @@ var _ = Describe("CreateApplication method input parameters and dependency test"
 		tenantDataService        *service.TenantDataService
 		mockUUIDGeneratorService *MockUUIDGeneratorService
 		validTenantID            system.UUID
-		validApplication         contract.Application
 	)
 
 	BeforeEach(func() {
@@ -27,9 +25,6 @@ var _ = Describe("CreateApplication method input parameters and dependency test"
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: &gocql.ClusterConfig{}}
 
 		validTenantID, _ = system.RandomUUID()
-
-		randomValue, _ := system.RandomUUID()
-		validApplication = contract.Application{Name: randomValue.String()}
 	})
 
 	AfterEach(func() {
@@ -40,7 +35,7 @@ var _ = Describe("CreateApplication method input parameters and dependency test"
 		It("should panic", func() {
 			tenantDataService.UUIDGeneratorService = nil
 
-			Ω(func() { tenantDataService.CreateApplication(validTenantID, validApplication) }).Should(Panic())
+			Ω(func() { tenantDataService.CreateApplication(validTenantID, createApplicationInfo()) }).Should(Panic())
 		})
 	})
 
@@ -48,7 +43,7 @@ var _ = Describe("CreateApplication method input parameters and dependency test"
 		It("should panic", func() {
 			tenantDataService.ClusterConfig = nil
 
-			Ω(func() { tenantDataService.CreateApplication(validTenantID, validApplication) }).Should(Panic())
+			Ω(func() { tenantDataService.CreateApplication(validTenantID, createApplicationInfo()) }).Should(Panic())
 		})
 	})
 })

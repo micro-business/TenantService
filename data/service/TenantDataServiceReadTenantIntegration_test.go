@@ -16,7 +16,6 @@ import (
 var _ = Describe("ReadTenant method behaviour", func() {
 	var (
 		tenantDataService *service.TenantDataService
-		validTenantID     system.UUID
 		clusterConfig     *gocql.ClusterConfig
 	)
 
@@ -25,8 +24,6 @@ var _ = Describe("ReadTenant method behaviour", func() {
 		clusterConfig.Keyspace = keyspace
 
 		tenantDataService = &service.TenantDataService{ClusterConfig: clusterConfig}
-
-		validTenantID, _ = system.RandomUUID()
 	})
 
 	It("should return error if tenant does not exist", func() {

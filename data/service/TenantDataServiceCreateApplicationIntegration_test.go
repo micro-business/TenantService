@@ -10,7 +10,6 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/data/contract"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -21,8 +20,6 @@ var _ = Describe("CreateApplication method behaviour", func() {
 		mockCtrl                 *gomock.Controller
 		tenantDataService        *service.TenantDataService
 		mockUUIDGeneratorService *MockUUIDGeneratorService
-		validApplicationID       system.UUID
-		validApplication         contract.Application
 		clusterConfig            *gocql.ClusterConfig
 	)
 
@@ -34,11 +31,6 @@ var _ = Describe("CreateApplication method behaviour", func() {
 		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
 
 		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
-
-		validApplicationID, _ = system.RandomUUID()
-
-		randomValue, _ := system.RandomUUID()
-		validApplication = contract.Application{Name: randomValue.String()}
 	})
 
 	AfterEach(func() {
@@ -56,7 +48,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 				GenerateRandomUUID().
 				Return(expectedApplicationID, nil)
 
-			newApplicationID, err := tenantDataService.CreateApplication(tenantID, validApplication)
+			newApplicationID, err := tenantDataService.CreateApplication(tenantID, createApplicationInfo())
 
 			Expect(newApplicationID).To(Equal(expectedApplicationID))
 			Expect(err).To(BeNil())
@@ -75,7 +67,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 				GenerateRandomUUID().
 				Return(system.EmptyUUID, expectedError)
 
-			newApplicationID, err := tenantDataService.CreateApplication(tenantID, validApplication)
+			newApplicationID, err := tenantDataService.CreateApplication(tenantID, createApplicationInfo())
 
 			Expect(newApplicationID).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(expectedError))
@@ -85,7 +77,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 	Context("when creating new application", func() {
 		It("should return error if tenant does not exist", func() {
 			invalidTenantID, _ := system.RandomUUID()
-			newApplicationID, err := tenantDataService.CreateApplication(invalidTenantID, validApplication)
+			newApplicationID, err := tenantDataService.CreateApplication(invalidTenantID, createApplicationInfo())
 
 			Expect(newApplicationID).To(Equal(system.EmptyUUID))
 			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", invalidTenantID.String())))
@@ -95,14 +87,16 @@ var _ = Describe("CreateApplication method behaviour", func() {
 			tenantID, _, err := createTenant(keyspace)
 			Expect(err).To(BeNil())
 
+			applicationID, _ := system.RandomUUID()
 			mockUUIDGeneratorService.
 				EXPECT().
 				GenerateRandomUUID().
-				Return(validApplicationID, nil)
+				Return(applicationID, nil)
 
-			newApplicationID, err := tenantDataService.CreateApplication(tenantID, validApplication)
+			application := createApplicationInfo()
+			newApplicationID, err := tenantDataService.CreateApplication(tenantID, application)
 
-			Expect(newApplicationID).To(Equal(validApplicationID))
+			Expect(newApplicationID).To(Equal(applicationID))
 			Expect(err).To(BeNil())
 
 			config := getClusterConfig()
@@ -121,14 +115,14 @@ var _ = Describe("CreateApplication method behaviour", func() {
 					" tenant_id = ?"+
 					" AND application_id = ?",
 				tenantID.String(),
-				validApplicationID.String()).Iter()
+				applicationID.String()).Iter()
 
 			defer iter.Close()
 
 			var name string
 
 			Expect(iter.Scan(&name)).To(BeTrue())
-			Expect(name).To(Equal(validApplication.Name))
+			Expect(name).To(Equal(application.Name))
 		})
 	})
 })
