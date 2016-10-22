@@ -26,7 +26,7 @@ var _ = Describe("UpdateApplication method behaviour", func() {
 		tenantDataService = &service.TenantDataService{ClusterConfig: clusterConfig}
 	})
 
-	Context("when updating an existing tenant", func() {
+	Context("when updating an existing application", func() {
 		It("should return error if tenant does not exist", func() {
 			_, _, applicationID, _, err := createApplication(keyspace)
 			Expect(err).To(BeNil())
@@ -44,12 +44,11 @@ var _ = Describe("UpdateApplication method behaviour", func() {
 			Expect(tenantDataService.UpdateApplication(tenantID, invalidApplicationID, createApplicationInfo())).To(Equal(fmt.Errorf("Tenant Application not found. Tenant ID: %s, Application ID: %s", tenantID.String(), invalidApplicationID.String())))
 		})
 
-		It("should update the record in tenant table", func() {
+		It("should update the record in application table", func() {
 			tenantID, _, applicationID, _, err := createApplication(keyspace)
 			Expect(err).To(BeNil())
 
 			updatedTenant := createApplicationInfo()
-
 			Expect(tenantDataService.UpdateApplication(tenantID, applicationID, updatedTenant)).To(BeNil())
 
 			config := getClusterConfig()
@@ -62,11 +61,13 @@ var _ = Describe("UpdateApplication method behaviour", func() {
 			Expect(err).To(BeNil())
 
 			iter := session.Query(
-				"SELECT secret_key"+
-					" FROM tenant"+
+				"SELECT name"+
+					" FROM application"+
 					" WHERE"+
-					" tenant_id = ?",
-				tenantID.String()).Iter()
+					" tenant_id = ?"+
+					" AND application_id = ?",
+				tenantID.String(),
+				applicationID.String()).Iter()
 
 			defer iter.Close()
 
