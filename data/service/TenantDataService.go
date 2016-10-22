@@ -268,6 +268,8 @@ func readTenant(tenantID system.UUID, session *gocql.Session) (contract.Tenant, 
 			" tenant_id = ?",
 		tenantID.String()).Iter()
 
+	defer iter.Close()
+
 	tenant := contract.Tenant{}
 
 	if !iter.Scan(&tenant.SecretKey) {
@@ -286,6 +288,8 @@ func doesTenantExist(tenantID system.UUID, session *gocql.Session) bool {
 			" WHERE"+
 			" tenant_id = ?",
 		tenantID.String()).Iter()
+
+	defer iter.Close()
 
 	var secretKey string
 
@@ -317,6 +321,8 @@ func readApplication(tenantID, applicationID system.UUID, session *gocql.Session
 			" AND application_id = ?",
 		tenantID.String(),
 		applicationID.String()).Iter()
+
+	defer iter.Close()
 
 	application := contract.Application{}
 
