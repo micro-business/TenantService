@@ -32,7 +32,7 @@ var inputTenantType = graphql.NewInputObject(
 	},
 )
 
-func getTenant() *graphql.Field {
+func getTenantQuery() *graphql.Field {
 	return &graphql.Field{
 		Type:        tenantType,
 		Description: "Returns an existing tenant",
@@ -62,7 +62,7 @@ func getTenant() *graphql.Field {
 	}
 }
 
-func getCreateTenant() *graphql.Field {
+func getCreateTenantQuery() *graphql.Field {
 	return &graphql.Field{
 		Type:        graphql.ID,
 		Description: "Creates new tenant",
@@ -89,7 +89,7 @@ func getCreateTenant() *graphql.Field {
 	}
 }
 
-func getUpdateTenant() *graphql.Field {
+func getUpdateTenantQuery() *graphql.Field {
 	return &graphql.Field{
 		Type:        graphql.ID,
 		Description: "Updates existing tenant",
@@ -127,7 +127,7 @@ func getUpdateTenant() *graphql.Field {
 	}
 }
 
-func getDeleteTenant() *graphql.Field {
+func getDeleteTenantQuery() *graphql.Field {
 	return &graphql.Field{
 		Type:        graphql.ID,
 		Description: "Deletes existing tenant",
