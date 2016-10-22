@@ -88,15 +88,29 @@ func createTenantKeyspaceAndAllRequiredTables(keyspace string) {
 }
 
 func createTenant(keyspace string) (system.UUID, error) {
-	clusterConfig := getClusterConfig()
-	clusterConfig.Keyspace = keyspace
-
-	tenantDataService := &service.TenantDataService{UUIDGeneratorService: system.UUIDGeneratorServiceImpl{}, ClusterConfig: clusterConfig}
-
 	randomValue, _ := system.RandomUUID()
 	validTenant := contract.Tenant{SecretKey: randomValue.String()}
 
-	return tenantDataService.CreateTenant(validTenant)
+	return createService().CreateTenant(validTenant)
+}
+
+func createApplication(keyspace string) (system.UUID, system.UUID, error) {
+	tenantID, err := createTenant(keyspace)
+
+	if err != nil {
+		return system.EmptyUUID, system.EmptyUUID, err
+	}
+
+	randomValue, _ := system.RandomUUID()
+	validApplication := contract.Application{Name: randomValue.String()}
+
+	applicationID, err := createService().CreateApplication(tenantID, validApplication)
+
+	if err != nil {
+		return system.EmptyUUID, system.EmptyUUID, err
+	}
+
+	return tenantID, applicationID, nil
 }
 
 func dropKeyspace(keyspace string) {
@@ -123,4 +137,11 @@ func mapGocqlUUIDToSystemUUID(uuid gocql.UUID) system.UUID {
 	mappedUUID, _ := system.UUIDFromBytes(uuid.Bytes())
 
 	return mappedUUID
+}
+
+func createService() contract.TenantDataService {
+	clusterConfig := getClusterConfig()
+	clusterConfig.Keyspace = keyspace
+
+	return &service.TenantDataService{UUIDGeneratorService: system.UUIDGeneratorServiceImpl{}, ClusterConfig: clusterConfig}
 }
