@@ -87,30 +87,36 @@ func createTenantKeyspaceAndAllRequiredTables(keyspace string) {
 		Exec()).To(BeNil())
 }
 
-func createTenant(keyspace string) (system.UUID, error) {
+func createTenant(keyspace string) (system.UUID, contract.Tenant, error) {
 	randomValue, _ := system.RandomUUID()
-	validTenant := contract.Tenant{SecretKey: randomValue.String()}
+	tenant := contract.Tenant{SecretKey: randomValue.String()}
 
-	return createService().CreateTenant(validTenant)
+	tenantID, err := createService().CreateTenant(tenant)
+
+	if err != nil {
+		return system.EmptyUUID, contract.Tenant{}, nil
+	}
+
+	return tenantID, tenant, nil
 }
 
-func createApplication(keyspace string) (system.UUID, system.UUID, error) {
-	tenantID, err := createTenant(keyspace)
+func createApplication(keyspace string) (system.UUID, contract.Tenant, system.UUID, contract.Application, error) {
+	tenantID, tenant, err := createTenant(keyspace)
 
 	if err != nil {
-		return system.EmptyUUID, system.EmptyUUID, err
+		return system.EmptyUUID, contract.Tenant{}, system.EmptyUUID, contract.Application{}, err
 	}
 
 	randomValue, _ := system.RandomUUID()
-	validApplication := contract.Application{Name: randomValue.String()}
+	application := contract.Application{Name: randomValue.String()}
 
-	applicationID, err := createService().CreateApplication(tenantID, validApplication)
+	applicationID, err := createService().CreateApplication(tenantID, application)
 
 	if err != nil {
-		return system.EmptyUUID, system.EmptyUUID, err
+		return system.EmptyUUID, contract.Tenant{}, system.EmptyUUID, contract.Application{}, err
 	}
 
-	return tenantID, applicationID, nil
+	return tenantID, tenant, applicationID, application, nil
 }
 
 func dropKeyspace(keyspace string) {

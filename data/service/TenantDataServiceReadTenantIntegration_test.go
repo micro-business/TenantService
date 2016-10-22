@@ -7,9 +7,7 @@ import (
 	"testing"
 
 	"github.com/gocql/gocql"
-	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/data/contract"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -17,48 +15,32 @@ import (
 
 var _ = Describe("ReadTenant method behaviour", func() {
 	var (
-		mockCtrl                 *gomock.Controller
-		tenantDataService        *service.TenantDataService
-		mockUUIDGeneratorService *MockUUIDGeneratorService
-		validTenantID            system.UUID
-		clusterConfig            *gocql.ClusterConfig
+		tenantDataService *service.TenantDataService
+		validTenantID     system.UUID
+		clusterConfig     *gocql.ClusterConfig
 	)
 
 	BeforeEach(func() {
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
 
-		mockCtrl = gomock.NewController(GinkgoT())
-		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
-
-		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
+		tenantDataService = &service.TenantDataService{ClusterConfig: clusterConfig}
 
 		validTenantID, _ = system.RandomUUID()
 	})
 
-	AfterEach(func() {
-		mockCtrl.Finish()
-	})
-
 	It("should return error if tenant does not exist", func() {
-		_, err := tenantDataService.ReadTenant(validTenantID)
+		invalidTenantID, _ := system.RandomUUID()
+		_, err := tenantDataService.ReadTenant(invalidTenantID)
 
-		Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", validTenantID.String())))
+		Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", invalidTenantID.String())))
 	})
 
 	It("should return the existing tenant", func() {
-		mockUUIDGeneratorService.
-			EXPECT().
-			GenerateRandomUUID().
-			Return(validTenantID, nil)
-
-		randomValue, _ := system.RandomUUID()
-		expectedTenant := contract.Tenant{SecretKey: randomValue.String()}
-		returnedTenantID, err := tenantDataService.CreateTenant(expectedTenant)
-
+		tenantID, expectedTenant, err := createTenant(keyspace)
 		Expect(err).To(BeNil())
 
-		returnedTenant, err := tenantDataService.ReadTenant(returnedTenantID)
+		returnedTenant, err := tenantDataService.ReadTenant(tenantID)
 
 		Expect(err).To(BeNil())
 		Expect(returnedTenant).To(Equal(expectedTenant))

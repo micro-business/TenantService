@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/gocql/gocql"
-	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	"github.com/microbusinesses/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
@@ -16,53 +15,40 @@ import (
 
 var _ = Describe("DeleteApplication method behaviour", func() {
 	var (
-		mockCtrl                 *gomock.Controller
-		tenantDataService        *service.TenantDataService
-		mockUUIDGeneratorService *MockUUIDGeneratorService
-		clusterConfig            *gocql.ClusterConfig
+		tenantDataService *service.TenantDataService
+		clusterConfig     *gocql.ClusterConfig
 	)
 
 	BeforeEach(func() {
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
 
-		mockCtrl = gomock.NewController(GinkgoT())
-		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
-
-		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
-	})
-
-	AfterEach(func() {
-		mockCtrl.Finish()
+		tenantDataService = &service.TenantDataService{ClusterConfig: clusterConfig}
 	})
 
 	Context("when deleting existing application", func() {
 		It("should return error if tenant does not exist", func() {
-			_, applicationID, err := createApplication(keyspace)
+			_, _, applicationID, _, err := createApplication(keyspace)
 			Expect(err).To(BeNil())
 
 			invalidTenantID, _ := system.RandomUUID()
-			err = tenantDataService.DeleteApplication(invalidTenantID, applicationID)
-
-			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", invalidTenantID.String())))
+			Expect(tenantDataService.DeleteApplication(invalidTenantID, applicationID)).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", invalidTenantID.String())))
 		})
 
 		It("should return error if application does not exist", func() {
-			tenantID, err := createTenant(keyspace)
+			tenantID, _, err := createTenant(keyspace)
 			Expect(err).To(BeNil())
 
 			invalidApplicationID, _ := system.RandomUUID()
-			err = tenantDataService.DeleteApplication(tenantID, invalidApplicationID)
 
-			Expect(err).To(Equal(fmt.Errorf("Tenant Application not found. Tenant ID: %s, Application ID: %s", tenantID.String(), invalidApplicationID.String())))
+			Expect(tenantDataService.DeleteApplication(tenantID, invalidApplicationID)).To(Equal(fmt.Errorf("Tenant Application not found. Tenant ID: %s, Application ID: %s", tenantID.String(), invalidApplicationID.String())))
 		})
 
 		It("should remove the record from application table", func() {
-			tenantID, applicationID, err := createApplication(keyspace)
+			tenantID, _, applicationID, _, err := createApplication(keyspace)
 			Expect(err).To(BeNil())
 
-			err = tenantDataService.DeleteApplication(tenantID, applicationID)
-			Expect(err).To(BeNil())
+			Expect(tenantDataService.DeleteApplication(tenantID, applicationID)).To(BeNil())
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace

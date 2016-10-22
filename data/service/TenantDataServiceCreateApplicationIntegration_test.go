@@ -47,7 +47,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 
 	Context("when UUID generator service succeeds to create the new UUID", func() {
 		It("should return the new UUID as application unique identifier and no error", func() {
-			tenantID, err := createTenant(keyspace)
+			tenantID, _, err := createTenant(keyspace)
 			Expect(err).To(BeNil())
 
 			expectedApplicationID, _ := system.RandomUUID()
@@ -65,7 +65,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 
 	Context("when UUID generator service fails to create the new UUID", func() {
 		It("should return application unique identifier as empty UUID and the returned error by tenant data service", func() {
-			tenantID, err := createTenant(keyspace)
+			tenantID, _, err := createTenant(keyspace)
 			Expect(err).To(BeNil())
 
 			expectedErrorID, _ := system.RandomUUID()
@@ -92,7 +92,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 		})
 
 		It("should insert the record into application table", func() {
-			tenantID, err := createTenant(keyspace)
+			tenantID, _, err := createTenant(keyspace)
 			Expect(err).To(BeNil())
 
 			mockUUIDGeneratorService.

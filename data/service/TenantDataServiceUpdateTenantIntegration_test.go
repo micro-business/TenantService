@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/gocql/gocql"
-	"github.com/golang/mock/gomock"
 	"github.com/microbusinesses/Micro-Businesses-Core/system"
 	"github.com/microbusinesses/TenantService/data/contract"
 	"github.com/microbusinesses/TenantService/data/service"
@@ -17,56 +16,36 @@ import (
 
 var _ = Describe("UpdateTenant method behaviour", func() {
 	var (
-		mockCtrl                 *gomock.Controller
-		tenantDataService        *service.TenantDataService
-		mockUUIDGeneratorService *MockUUIDGeneratorService
-		validTenantID            system.UUID
-		validTenant              contract.Tenant
-		clusterConfig            *gocql.ClusterConfig
+		tenantDataService *service.TenantDataService
+		clusterConfig     *gocql.ClusterConfig
 	)
 
 	BeforeEach(func() {
 		clusterConfig = getClusterConfig()
 		clusterConfig.Keyspace = keyspace
 
-		mockCtrl = gomock.NewController(GinkgoT())
-		mockUUIDGeneratorService = NewMockUUIDGeneratorService(mockCtrl)
-
-		tenantDataService = &service.TenantDataService{UUIDGeneratorService: mockUUIDGeneratorService, ClusterConfig: clusterConfig}
-
-		validTenantID, _ = system.RandomUUID()
-
-		randomValue, _ := system.RandomUUID()
-		validTenant = contract.Tenant{SecretKey: randomValue.String()}
-	})
-
-	AfterEach(func() {
-		mockCtrl.Finish()
+		tenantDataService = &service.TenantDataService{ClusterConfig: clusterConfig}
 	})
 
 	Context("when updating an existing tenant", func() {
 		It("should return error if tenant does not exist", func() {
-			err := tenantDataService.UpdateTenant(validTenantID, validTenant)
+			randomValue, _ := system.RandomUUID()
+			tenant := contract.Tenant{SecretKey: randomValue.String()}
 
-			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", validTenantID.String())))
+			invalidTenantID, _ := system.RandomUUID()
+			err := tenantDataService.UpdateTenant(invalidTenantID, tenant)
+
+			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", invalidTenantID.String())))
 		})
 
 		It("should update the record in tenant table", func() {
-			mockUUIDGeneratorService.
-				EXPECT().
-				GenerateRandomUUID().
-				Return(validTenantID, nil)
-
-			returnedTenantID, err := tenantDataService.CreateTenant(validTenant)
-
+			tenantID, _, err := createTenant(keyspace)
 			Expect(err).To(BeNil())
 
 			randomValue, _ := system.RandomUUID()
 			updatedTenant := contract.Tenant{SecretKey: randomValue.String()}
 
-			err = tenantDataService.UpdateTenant(returnedTenantID, updatedTenant)
-
-			Expect(err).To(BeNil())
+			Expect(tenantDataService.UpdateTenant(tenantID, updatedTenant)).To(BeNil())
 
 			config := getClusterConfig()
 			config.Keyspace = keyspace
@@ -82,7 +61,7 @@ var _ = Describe("UpdateTenant method behaviour", func() {
 					" FROM tenant"+
 					" WHERE"+
 					" tenant_id = ?",
-				validTenantID.String()).Iter()
+				tenantID.String()).Iter()
 
 			defer iter.Close()
 
