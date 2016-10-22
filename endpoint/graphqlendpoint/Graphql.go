@@ -13,8 +13,9 @@ var rootQueryType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "RootQuery",
 		Fields: graphql.Fields{
-			"tenant":      getTenantQuery(),
-			"application": getApplicationQuery(),
+			"tenant":       getTenantQuery(),
+			"application":  getApplicationQuery(),
+			"applications": getApplicationsQuery(),
 		},
 	},
 )
