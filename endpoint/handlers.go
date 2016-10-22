@@ -1,7 +1,6 @@
 package endpoint
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,37 +24,15 @@ func (endpoint Endpoint) StartServer() {
 	diagnostics.IsNotNil(endpoint.TenantService, "endpoint.TenantService", "TenantService must be provided.")
 	diagnostics.IsNotNil(endpoint.ConfigurationReader, "endpoint.ConfigurationReader", "ConfigurationReader must be provided.")
 
-	ctx := context.Background()
-
-	handlers := getHandlers(endpoint, ctx)
-	http.HandleFunc("/CheckHealth", checkHealthHandleFunc)
-
-	for pattern, handler := range handlers {
-		http.Handle(pattern, handler)
-	}
+	http.Handle("/Api", httptransport.NewServer(
+		context.Background(),
+		createAPIEndpoint(endpoint.TenantService),
+		transport.DecodeAPIRequest,
+		transport.EncodeAPIResponse))
 
 	if listeningPort, err := endpoint.ConfigurationReader.GetListeningPort(); err != nil {
 		log.Fatal(err.Error())
 	} else {
 		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(listeningPort), nil))
 	}
-}
-
-func getHandlers(endpoint Endpoint, ctx context.Context) map[string]http.Handler {
-	handlers := make(map[string]http.Handler)
-	handlers["/Api"] = createAPIHandler(endpoint, ctx)
-
-	return handlers
-}
-
-func checkHealthHandleFunc(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintln(writer, "Alive")
-}
-
-func createAPIHandler(endpoint Endpoint, ctx context.Context) http.Handler {
-	return httptransport.NewServer(
-		ctx,
-		createAPIEndpoint(endpoint.TenantService),
-		transport.DecodeAPIRequest,
-		transport.EncodeAPIResponse)
 }
