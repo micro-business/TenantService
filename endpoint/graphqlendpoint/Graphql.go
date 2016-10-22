@@ -13,7 +13,8 @@ var rootQueryType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "RootQuery",
 		Fields: graphql.Fields{
-			"tenant": getTenantQuery(),
+			"tenant":      getTenantQuery(),
+			"application": getApplicationQuery(),
 		},
 	},
 )
@@ -22,9 +23,12 @@ var rootMutationType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "RootMutation",
 		Fields: graphql.Fields{
-			"createTenant": getCreateTenantQuery(),
-			"updateTenant": getUpdateTenantQuery(),
-			"deleteTenant": getDeleteTenantQuery(),
+			"createTenant":      getCreateTenantQuery(),
+			"updateTenant":      getUpdateTenantQuery(),
+			"deleteTenant":      getDeleteTenantQuery(),
+			"createApplication": getCreateApplicationQuery(),
+			"updateApplication": getUpdateApplicationQuery(),
+			"deleteApplication": getDeleteApplicationQuery(),
 		},
 	},
 )
