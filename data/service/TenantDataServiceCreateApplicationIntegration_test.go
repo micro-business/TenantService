@@ -83,12 +83,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 	})
 
 	Context("when creating new application", func() {
-		It("should insert the record into application table", func() {
-			mockUUIDGeneratorService.
-				EXPECT().
-				GenerateRandomUUID().
-				Return(validApplicationID, nil)
-
+		It("should return error if tenant does not exist", func() {
 			invalidTenantID, _ := system.RandomUUID()
 			newApplicationID, err := tenantDataService.CreateApplication(invalidTenantID, validApplication)
 
@@ -96,7 +91,7 @@ var _ = Describe("CreateApplication method behaviour", func() {
 			Expect(err).To(Equal(fmt.Errorf("Tenant not found. Tenant ID: %s", invalidTenantID.String())))
 		})
 
-		It("should return error if tenant does not exist", func() {
+		It("should insert the record into application table", func() {
 			tenantID, err := createTenant(keyspace)
 			Expect(err).To(BeNil())
 
