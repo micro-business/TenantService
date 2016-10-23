@@ -32,15 +32,17 @@ var _ = Describe("TenantQuery method input parameters and dependency test", func
 		It("should return error if no TenantID provided", func() {
 			query := "{tenant{ID SecretKey}}"
 
-			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+			result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
+			Expect(result).To(BeNil())
 		})
 
 		It("should return error if TenantID format is not UUID", func() {
 			query := "{tenant(tenantID:\"invalid UUID\"){ID SecretKey}}"
 
-			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+			result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
+			Expect(result).To(BeNil())
 		})
 	})
 })
@@ -79,9 +81,9 @@ var _ = Describe("TenantQuery method behaviour", func() {
 
 		query := "{tenant(tenantID:\"" + tenantID.String() + "\"){ID SecretKey}}"
 
-		returnedTenant, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+		result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 		Expect(err).To(Equal(fmt.Errorf(randomValue.String())))
-		Expect(returnedTenant).To(BeNil())
+		Expect(result).To(BeNil())
 	})
 
 	It("should return tenant information if tenant service ReadTenant function returns an tenant information", func() {
@@ -125,7 +127,7 @@ var _ = Describe("TenantQuery method behaviour", func() {
 		Expect(returnedTenant).To(Equal(expectedTenant))
 	})
 
-	It("should return tenant information (only Name) if tenant service ReadTenant function returns an tenant information", func() {
+	It("should return tenant information (only SecretKey) if tenant service ReadTenant function returns an tenant information", func() {
 		randomValue, _ := system.RandomUUID()
 		tenant := domain.Tenant{SecretKey: randomValue.String()}
 		mockTenantService.EXPECT().ReadTenant(tenantID).Return(tenant, nil)

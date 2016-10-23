@@ -37,29 +37,33 @@ var _ = Describe("ApplicationQuery method input parameters and dependency test",
 		It("should return error if no TenantID provided", func() {
 			query := "{application(applicationID:\"" + applicationID.String() + "\"){ID Name}}"
 
-			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+			result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
+			Expect(result).To(BeNil())
 		})
 
 		It("should return error if no ApplicationID provided", func() {
 			query := "{application(tenantID:\"" + tenantID.String() + "\"){ID Name}}"
 
-			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+			result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
+			Expect(result).To(BeNil())
 		})
 
 		It("should return error if TenantID format is not UUID", func() {
 			query := "{application(tenantID:\"invalid UUID\", applicationID:\"" + applicationID.String() + "\"){ID Name}}"
 
-			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+			result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
+			Expect(result).To(BeNil())
 		})
 
 		It("should return error if ApplicationID format is not UUID", func() {
 			query := "{application(tenantID:\"" + tenantID.String() + "\", applicationID:\"invalid UUID\"){ID Name}}"
 
-			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+			result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
+			Expect(result).To(BeNil())
 		})
 	})
 })
@@ -100,9 +104,9 @@ var _ = Describe("ApplicationQuery method behaviour", func() {
 
 		query := "{application(tenantID:\"" + tenantID.String() + "\", applicationID:\"" + applicationID.String() + "\"){ID Name}}"
 
-		returnedApplication, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+		result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 		Expect(err).To(Equal(fmt.Errorf(randomValue.String())))
-		Expect(returnedApplication).To(BeNil())
+		Expect(result).To(BeNil())
 	})
 
 	It("should return application information if tenant service ReadApplication function returns an application information", func() {

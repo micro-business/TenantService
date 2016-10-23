@@ -38,15 +38,17 @@ var _ = Describe("ApplicationsQuery method input parameters and dependency test"
 		It("should return error if no TenantID provided", func() {
 			query := "{applications{ID Name}}"
 
-			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+			result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
+			Expect(result).To(BeNil())
 		})
 
 		It("should return error if TenantID format is not UUID", func() {
 			query := "{applications(tenantID:\"invalid UUID\"){ID Name}}"
 
-			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+			result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
+			Expect(result).To(BeNil())
 		})
 	})
 })
@@ -84,9 +86,9 @@ var _ = Describe("ApplicationsQuery method behaviour", func() {
 
 		query := "{applications(tenantID:\"" + tenantID.String() + "\"){ID Name}}"
 
-		returnedApplications, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
+		result, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 		Expect(err).To(Equal(fmt.Errorf(randomValue.String())))
-		Expect(returnedApplications).To(BeNil())
+		Expect(result).To(BeNil())
 	})
 
 	It("should return applications information if tenant service ReadAllApplications function returns applications information", func() {
