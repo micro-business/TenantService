@@ -80,7 +80,7 @@ var _ = Describe("CreateTenant method behaviour", func() {
 		Expect(result).To(BeNil())
 	})
 
-	It("should return true if tenant service CreateTenant function returns no error", func() {
+	It("should return tenant unique identifier if tenant service CreateTenant function returns no error", func() {
 		mockTenantService.EXPECT().CreateTenant(tenant).Return(tenantID, nil)
 
 		expectedTenant := &graphql.Result{
