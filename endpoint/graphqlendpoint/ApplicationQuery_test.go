@@ -48,14 +48,14 @@ var _ = Describe("ApplicationQuery method input parameters and dependency test",
 			Expect(err).NotTo(BeNil())
 		})
 
-		It("should return error if no TenantID format is not UUID", func() {
+		It("should return error if TenantID format is not UUID", func() {
 			query := "{application(tenantID:\"invalid UUID\", applicationID:\"" + applicationID.String() + "\"){ID Name}}"
 
 			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
 			Expect(err).NotTo(BeNil())
 		})
 
-		It("should return error if no ApplicationID format is not UUID", func() {
+		It("should return error if ApplicationID format is not UUID", func() {
 			query := "{application(tenantID:\"" + tenantID.String() + "\", applicationID:\"invalid UUID\"){ID Name}}"
 
 			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)

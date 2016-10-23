@@ -23,14 +23,11 @@ var _ = Describe("ApplicationsQuery method input parameters and dependency test"
 	var (
 		mockCtrl          *gomock.Controller
 		mockTenantService *MockTenantService
-		tenantID          system.UUID
 	)
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		mockTenantService = NewMockTenantService(mockCtrl)
-
-		tenantID, _ = system.RandomUUID()
 	})
 
 	AfterEach(func() {
@@ -45,7 +42,7 @@ var _ = Describe("ApplicationsQuery method input parameters and dependency test"
 			Expect(err).NotTo(BeNil())
 		})
 
-		It("should return error if no TenantID format is not UUID", func() {
+		It("should return error if TenantID format is not UUID", func() {
 			query := "{applications(tenantID:\"invalid UUID\"){ID Name}}"
 
 			_, err := graphqlendpoint.ExecuteQuery(query, mockTenantService)
