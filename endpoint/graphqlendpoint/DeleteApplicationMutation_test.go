@@ -6,8 +6,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/graphql-go/graphql"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/endpoint/graphqlendpoint"
+	"github.com/microbusinesslimited/Micro-Business-Core/system"
+	"github.com/microbusinesslimited/TenantService/endpoint/graphqlendpoint"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

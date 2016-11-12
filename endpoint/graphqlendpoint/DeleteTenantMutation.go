@@ -2,7 +2,7 @@ package graphqlendpoint
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
+	"github.com/microbusinesslimited/Micro-Business-Core/system"
 )
 
 func getDeleteTenantQuery() *graphql.Field {

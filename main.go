@@ -8,12 +8,12 @@ import (
 	"strings"
 
 	"github.com/gocql/gocql"
-	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	businessService "github.com/microbusinesses/TenantService/business/service"
-	"github.com/microbusinesses/TenantService/config"
-	dataService "github.com/microbusinesses/TenantService/data/service"
-	"github.com/microbusinesses/TenantService/endpoint"
+	"github.com/microbusinesslimited/Micro-Business-Core/common/diagnostics"
+	"github.com/microbusinesslimited/Micro-Business-Core/system"
+	businessService "github.com/microbusinesslimited/TenantService/business/service"
+	"github.com/microbusinesslimited/TenantService/config"
+	dataService "github.com/microbusinesslimited/TenantService/data/service"
+	"github.com/microbusinesslimited/TenantService/endpoint"
 )
 
 var consulAddress string

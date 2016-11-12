@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/business/domain"
-	"github.com/microbusinesses/TenantService/business/service"
-	"github.com/microbusinesses/TenantService/data/contract"
+	"github.com/microbusinesslimited/Micro-Business-Core/system"
+	"github.com/microbusinesslimited/TenantService/business/domain"
+	"github.com/microbusinesslimited/TenantService/business/service"
+	"github.com/microbusinesslimited/TenantService/data/contract"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/gocql/gocql"
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/data/contract"
-	"github.com/microbusinesses/TenantService/data/service"
+	"github.com/microbusinesslimited/Micro-Business-Core/system"
+	"github.com/microbusinesslimited/TenantService/data/contract"
+	"github.com/microbusinesslimited/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

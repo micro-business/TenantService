@@ -1,8 +1,8 @@
 package service_test
 
 import (
-	"github.com/microbusinesses/Micro-Businesses-Core/system"
-	"github.com/microbusinesses/TenantService/data/contract"
+	"github.com/microbusinesslimited/Micro-Business-Core/system"
+	"github.com/microbusinesslimited/TenantService/data/contract"
 )
 
 func createTenantInfo() contract.Tenant {

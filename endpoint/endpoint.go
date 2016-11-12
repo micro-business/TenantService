@@ -9,10 +9,10 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/microbusinesses/Micro-Businesses-Core/common/diagnostics"
-	"github.com/microbusinesses/TenantService/business/contract"
-	"github.com/microbusinesses/TenantService/config"
-	"github.com/microbusinesses/TenantService/endpoint/graphqlendpoint"
+	"github.com/microbusinesslimited/Micro-Business-Core/common/diagnostics"
+	"github.com/microbusinesslimited/TenantService/business/contract"
+	"github.com/microbusinesslimited/TenantService/config"
+	"github.com/microbusinesslimited/TenantService/endpoint/graphqlendpoint"
 	"golang.org/x/net/context"
 )
 

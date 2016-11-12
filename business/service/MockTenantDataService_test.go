@@ -5,8 +5,8 @@ package service_test
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	system "github.com/microbusinesses/Micro-Businesses-Core/system"
-	. "github.com/microbusinesses/TenantService/data/contract"
+	system "github.com/microbusinesslimited/Micro-Business-Core/system"
+	. "github.com/microbusinesslimited/TenantService/data/contract"
 )
 
 // Mock of TenantDataService interface
