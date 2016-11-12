@@ -28,6 +28,7 @@ func (consul ConsulConfigurationReader) GetListeningPort() (int, error) {
 		return consul.ListeningPortToOverride, nil
 
 	}
+
 	consulHelper := config.ConsulHelper{ConsulAddress: consul.ConsulAddress, ConsulScheme: consul.ConsulScheme}
 
 	return consulHelper.GetInt(serviceListeningPortKey)
