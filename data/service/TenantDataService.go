@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/gocql/gocql"
-	"github.com/microbusinesslimited/Micro-Business-Core/common/diagnostics"
-	"github.com/microbusinesslimited/Micro-Business-Core/system"
-	"github.com/microbusinesslimited/TenantService/data/contract"
+	"github.com/micro-business/Micro-Business-Core/common/diagnostics"
+	"github.com/micro-business/Micro-Business-Core/system"
+	"github.com/micro-business/TenantService/data/contract"
 )
 
 // TenantDataService provides access to add new tenant and update/retrieve/remove an existing tenant.

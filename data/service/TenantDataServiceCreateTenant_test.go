@@ -5,7 +5,7 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/golang/mock/gomock"
-	"github.com/microbusinesslimited/TenantService/data/service"
+	"github.com/micro-business/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

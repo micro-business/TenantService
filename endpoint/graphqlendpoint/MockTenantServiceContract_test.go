@@ -5,8 +5,8 @@ package graphqlendpoint_test
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	system "github.com/microbusinesslimited/Micro-Business-Core/system"
-	domain "github.com/microbusinesslimited/TenantService/business/domain"
+	system "github.com/micro-business/Micro-Business-Core/system"
+	domain "github.com/micro-business/TenantService/business/domain"
 )
 
 // Mock of TenantService interface

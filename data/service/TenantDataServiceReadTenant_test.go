@@ -3,8 +3,8 @@ package service_test
 import (
 	"testing"
 
-	"github.com/microbusinesslimited/Micro-Business-Core/system"
-	"github.com/microbusinesslimited/TenantService/data/service"
+	"github.com/micro-business/Micro-Business-Core/system"
+	"github.com/micro-business/TenantService/data/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

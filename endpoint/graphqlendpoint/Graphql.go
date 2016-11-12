@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/graphql-go/graphql"
-	"github.com/microbusinesslimited/TenantService/business/contract"
+	"github.com/micro-business/TenantService/business/contract"
 	"golang.org/x/net/context"
 )
 

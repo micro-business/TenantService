@@ -1,4 +1,4 @@
 FROM ubuntu:latest
-MAINTAINER microbusinesslimited.inc@gmail.com
+MAINTAINER micro-business.inc@gmail.com
 ADD TenantService /
 CMD ["/TenantService"]

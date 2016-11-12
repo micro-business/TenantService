@@ -2,8 +2,8 @@
 package contract
 
 import (
-	"github.com/microbusinesslimited/Micro-Business-Core/system"
-	"github.com/microbusinesslimited/TenantService/business/domain"
+	"github.com/micro-business/Micro-Business-Core/system"
+	"github.com/micro-business/TenantService/business/domain"
 )
 
 // TenantService contract, it can add new tenant and update/retrieve/remove an existing tenant.

@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/microbusinesslimited/Micro-Business-Core/system"
-	"github.com/microbusinesslimited/TenantService/business/service"
+	"github.com/micro-business/Micro-Business-Core/system"
+	"github.com/micro-business/TenantService/business/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

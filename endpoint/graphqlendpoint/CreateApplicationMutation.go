@@ -2,7 +2,7 @@ package graphqlendpoint
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/microbusinesslimited/Micro-Business-Core/system"
+	"github.com/micro-business/Micro-Business-Core/system"
 )
 
 func getCreateApplicationQuery() *graphql.Field {

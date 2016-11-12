@@ -2,8 +2,8 @@ package graphqlendpoint
 
 import (
 	"github.com/graphql-go/graphql"
-	"github.com/microbusinesslimited/Micro-Business-Core/system"
-	"github.com/microbusinesslimited/TenantService/business/domain"
+	"github.com/micro-business/Micro-Business-Core/system"
+	"github.com/micro-business/TenantService/business/domain"
 )
 
 func getTenantQuery() *graphql.Field {

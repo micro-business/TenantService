@@ -1,7 +1,7 @@
 // Package contract defines the tenant data service contract.
 package contract
 
-import "github.com/microbusinesslimited/Micro-Business-Core/system"
+import "github.com/micro-business/Micro-Business-Core/system"
 
 // Tenant defines how a tenant should look like
 type Tenant struct {
