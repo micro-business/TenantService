@@ -28,7 +28,6 @@ func (endpoint Endpoint) StartServer() {
 	diagnostics.IsNotNil(endpoint.ConfigurationReader, "endpoint.ConfigurationReader", "ConfigurationReader must be provided.")
 
 	http.Handle("/Api", httptransport.NewServer(
-		context.Background(),
 		createAPIEndpoint(endpoint.TenantService),
 		decodeAPIRequest,
 		encodeAPIResponse))
